@@ -7,8 +7,9 @@ import {
 import AppLocale from "shared/localization";
 import { useThemeContext } from "../AppContextProvider/ThemeContextProvider";
 import { useLocaleContext } from "../AppContextProvider/LocaleContextProvide";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
+// import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import DateAdapter from '@mui/lab/AdapterMoment';
 
 interface AppThemeProviderProps {
   children: ReactElement;
@@ -22,7 +23,7 @@ const AppThemeProvider: React.FC<AppThemeProviderProps> = (props) => {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={createTheme(theme, muiLocale)}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={DateAdapter}>
           {props.children}
         </LocalizationProvider>
       </ThemeProvider>

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@date-io/date-fns": "2.11.0",
+    "@date-io/moment": "2.11.0",
     "@emotion/babel-plugin": "11.x",
     "@emotion/cache": "11.x",
     "@emotion/react": "11.x",
@@ -45,6 +46,7 @@
     "final-form": "4.x",
     "formik": "2.2.9",
     "kavenegar": "1.1.4",
+    "moment": "2.29.1",
     "prism-react-renderer": "1.2.1",
     "prop-types": "15.8.1",
     "raw-loader": "4.0.2",
