@@ -677,7 +677,7 @@
   resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.11.0.tgz#28580cda1c8228ab2c7ed6aee673ef0495f913e6"
   integrity sha512-DvPBnNoeuLaoSJZaxgpu54qzRhRKjSYVyQjhznTFrllKuDpm0sDFjHo6lvNLCM/cfMx2gb2PM2zY2kc9C8nmuw==
 
-"@date-io/date-fns@^2.11.0":
+"@date-io/date-fns@2.11.0", "@date-io/date-fns@^2.11.0":
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-2.11.0.tgz#142fbf954eda7ad66514af7a2802d78c4ea40053"
   integrity sha512-mPQ71plBeFrArvBSHtjWMHXA89IUbZ6kuo2dsjlRC/1uNOybo91spIb+wTu03NxKTl8ut07s0jJ9svF71afpRg==
@@ -3894,6 +3894,11 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+date-fns@2.0.0-beta.5:
+  version "2.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.5.tgz#90885db3772802d55519cd12acd49de56aca1059"
+  integrity sha512-GS5yi964NDFNoja9yOdWFj9T97T67yLrUeJZgddHaVfc/6tHWtX7RXocuubmZkNzrZUZ9BqBOW7jTR5OoWjJ1w==
 
 dayjs@^1.10.6:
   version "1.10.7"
