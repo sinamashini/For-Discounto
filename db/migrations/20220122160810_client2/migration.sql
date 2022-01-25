@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Clients" ALTER COLUMN "notes" SET NOT NULL,
+ALTER COLUMN "notes" SET DATA TYPE TEXT;

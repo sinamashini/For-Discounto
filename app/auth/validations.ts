@@ -1,8 +1,9 @@
+import { GeneralErrors } from "shared/constants/ErrorsEnums"
 import { z } from "zod"
 
 export const email = z
-  .string()
-  .email()
+  .string({required_error: GeneralErrors.REQUIRED })
+  .email({message: GeneralErrors.EMAIL_FORMAT})
   .transform((str) => str.toLowerCase().trim())
 
 export const password = z
@@ -40,3 +41,4 @@ export const ChangePassword = z.object({
   currentPassword: z.string(),
   newPassword: password,
 })
+
