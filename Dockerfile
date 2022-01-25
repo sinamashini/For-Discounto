@@ -12,6 +12,7 @@ COPY package.json yarn.lock ./
 COPY db/ ./db/
 RUN yarn install --frozen-lockfile
 RUN yarn blitz prisma migrate
+RUN yarn blitz db seed
 
 COPY . .
 RUN yarn build
