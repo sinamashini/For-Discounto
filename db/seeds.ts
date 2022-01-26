@@ -18,21 +18,44 @@ import db from "./index"
  * or https://github.com/Marak/Faker.js to easily generate
  * realistic data.
  */
+// const seed = async () => {
+//   const hashedMeysamPassword = await SecurePassword.hash('meysam123!@');
+//   const parisaHashed = await SecurePassword.hash('parisa123!@');
+
+//   await db.user.create({
+//     data: {
+//       name: 'میثم یعقوب زاده', email: 'meysam@yahoo.com', hashedPassword: hashedMeysamPassword, role: "Admin"
+//     }
+//   });
+
+//   await db.user.create({
+//     data: {
+//       name: 'پریسا مدیر', email: 'parisa@yahoo.com', hashedPassword: parisaHashed, role: "Admin"
+//     }
+//   });
+
+// }
+
 const seed = async () => {
-  const hashedMeysamPassword = await SecurePassword.hash('meysam123!@');
-  const parisaHashed = await SecurePassword.hash('parisa123!@');
 
-  await db.user.create({
+  const packageResult = await db.package.create({
     data: {
-      name: 'میثم یعقوب زاده', email: 'meysam@yahoo.com', hashedPassword: hashedMeysamPassword, role: "Admin"
+      name: 'معمولی',
+      discountOfEachLevelByPercent: 5,
+      numberOfNesting: 3,
+      createdAt: new Date()
     }
   });
 
-  await db.user.create({
-    data: {
-      name: 'پریسا مدیر', email: 'parisa@yahoo.com', hashedPassword: parisaHashed, role: "Admin"
-    }
-  });
+  const clients = await db.clients.findMany({});
+  await db.packageClient.createMany({
+    data: clients.map(client => ({
+      packageId: packageResult.id,
+      clientId: client.id,
+      discountOfEachLevelByPercent: 5,
+      numberOfNesting: 3,
+    }))
+  })
 
 }
 
