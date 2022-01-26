@@ -1,3 +1,4 @@
+import { sendSingle } from "app/sms/sendSingle";
 import { resolver, SecurePassword } from "blitz"
 import db from "db"
 import { UpdateClient } from "../validation"
@@ -11,6 +12,8 @@ export default resolver.pipe(resolver.zod(UpdateClient), async (input, ctx) => {
     data: input.AddClient,
     include: {introduced: true, parent: true}
   });
+
+  sendSingle('thanks', client.contact, { token: client.name });
 
   return client
 })

@@ -9,7 +9,7 @@ import { useMutation } from 'blitz';
 import addClient from 'app/clients/mutations/addClient';
 import InfoViewGraphql from '@zhava/core/AppInfoView/InfoGraphql';
 import { GeneralErrors } from 'shared/constants/ErrorsEnums';
-import { fetchError } from 'app/redux/actions';
+import { fetchError, fetchStart, showMessage } from 'app/redux/actions';
 import { useDispatch } from 'react-redux';
 import updateClient from 'app/clients/mutations/updateClient';
 
@@ -27,9 +27,8 @@ const CreateContact: FC<CreateContactProps> = ({
   onUpdateContact,
 }) => {
   const dispatch = useDispatch();
-  const [addContact, { isLoading: addContactLoading, error }] = useMutation(addClient);
-  const [updateContact, { isLoading: updateLoading, error: updateError }] = useMutation(updateClient);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [addContact] = useMutation(addClient);
+  const [updateContact] = useMutation(updateClient);
 
   return (
     <AppDialog
@@ -38,7 +37,6 @@ const CreateContact: FC<CreateContactProps> = ({
       open={isAddContact}
       onClose={() => handleAddContactClose()}
     >
-      <InfoViewGraphql loading={addContactLoading || updateLoading} error={error as string || updateError as string} message={successMessage} >
       <Formik
         validateOnChange={true}
         initialValues={{
@@ -56,21 +54,23 @@ const CreateContact: FC<CreateContactProps> = ({
           onSubmit={async(data, { setSubmitting, resetForm }) => {
             try {
               setSubmitting(true);
+              dispatch(fetchStart());
               const opration = selectContact !== undefined ? 'update' : 'add';
               if (onUpdateContact) {
                 if (opration === 'add') {
                   const addedContact = await addContact(data);
-                  setSuccessMessage('کاربر جدید با موفقیت اضافه شد');
+                  dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
                   onUpdateContact(addedContact, opration);
+                  resetForm();
                 } else {
                   if (selectContact?.id) {
-                    const addedContact = await updateContact({ id: selectContact.id, AddClient: data });
-                    setSuccessMessage('اطلاعات کاربر با موفقیت ویرایش شد');
-                    onUpdateContact(addedContact, opration);
+                    const updatedCotact = await updateContact({ id: selectContact.id, AddClient: data });
+                    dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+                    onUpdateContact(updatedCotact, opration);
                   }
                 }
               }
-              resetForm();
+              handleAddContactClose()
               setSubmitting(false);
             } catch (err) {
               dispatch(fetchError(GeneralErrors.UNEXPECTED))
@@ -81,7 +81,6 @@ const CreateContact: FC<CreateContactProps> = ({
           <AddContactForm handleAddContactClose={handleAddContactClose} values={values}/>
         )}
         </Formik>
-        </InfoViewGraphql>
     </AppDialog>
   );
 };

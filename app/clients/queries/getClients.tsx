@@ -27,8 +27,8 @@ export default async function getClients(input: z.infer<typeof GetClients>, { se
   const where = createWhereQuery(mapedStatus);
 
   const clients = await db.clients.findMany({
-    where, include: { parent: true, introduced: true },
-    orderBy: [{ id: 'desc' }]
+    where, include: { parent: true, introduced: true, _count: { select: {introduced: true}} },
+    orderBy: [{ id: 'desc' }],
   });
 
   return clients;

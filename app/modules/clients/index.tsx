@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import AppsContainer from "@zhava/core/AppsContainer";
 import SideBarContent from "./ContactSideBar";
@@ -6,12 +6,18 @@ import ContatctsList from "./ContactDataGrid";
 import { AppInfoView } from "@zhava/index";
 import { useQuery, useRouter } from "blitz";
 import getClients from "app/clients/queries/getClients";
-import { Clients } from "@prisma/client";
+import getNestedClientById from "app/clients/queries/getNestedClientById";
 
 const Contact = () => {
   const { messages } = useIntl();
   const { query } = useRouter();
   const [clients, { isLoading, error, setQueryData }] = useQuery(getClients, { status: query.status as string });
+  const [client, { isLoading: loading }] = useQuery(getNestedClientById, { id: 1 });
+
+  if (!loading) {
+    console.log(client);
+  }
+
 
   const handleDelete = (id: number) => {
     setQueryData((data) => {

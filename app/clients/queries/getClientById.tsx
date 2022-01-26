@@ -1,18 +1,16 @@
 import { Ctx } from "blitz"
 import db from "db"
 import * as zod from "zod"
+import { GetClientId } from "../validation";
 
-const GetClient = zod.object({
-  id: zod.number(),
-})
 
 export default async function getClientById(
-  input: zod.infer<typeof GetClient>,
+  input: zod.infer<typeof GetClientId>,
   ctx: Ctx
 ) {
   await ctx.session.$authorize();
 
-  const data = GetClient.parse(input);
+  const data = GetClientId.parse(input);
 
   const client = await db.clients.findFirst({ where: { id: data.id } });
 

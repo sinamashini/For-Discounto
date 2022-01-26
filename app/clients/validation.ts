@@ -50,3 +50,6 @@ export function checkNationalCode(input: string) {
   return (sum < 2 && check == sum) || (sum >= 2 && check + sum == 11);
 }
 
+export const GetClientId = z.object({
+  id: z.number(),
+})
