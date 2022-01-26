@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { email } from '../auth/validations';
 import { GeneralErrors } from '../shared/constants/ErrorsEnums';
 
 export const name = z.string({required_error: GeneralErrors.REQUIRED});
@@ -11,7 +10,7 @@ export const nationalCode = z.string({required_error: GeneralErrors.REQUIRED}).r
 });
 
 export const AddClient = z.object({
-  email,
+  email: z.string().email({message: GeneralErrors.EMAIL_FORMAT}).transform((str) => str.toLowerCase().trim()).optional(),
   name,
   contact,
   nationalCode,

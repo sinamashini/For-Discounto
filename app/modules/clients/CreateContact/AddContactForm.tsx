@@ -63,16 +63,6 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
 
             <AppTextField
               sx={{
-                width: "100%",
-                mb: { xs: 4, xl: 6 },
-              }}
-              variant="outlined"
-              label={<IntlMessages id="common.email" />}
-              name="email"
-            />
-
-            <AppTextField
-              sx={{
                 mb: { xs: 4, xl: 6 },
                 width: "100%",
               }}
@@ -107,6 +97,16 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
             />
           </div>
         </Box>
+
+        <AppTextField
+              sx={{
+                width: "100%",
+                mb: { xs: 4, xl: 6 },
+              }}
+              variant="outlined"
+              label={<IntlMessages id="common.email" />}
+              name="email"
+        />
 
         <div>
 
