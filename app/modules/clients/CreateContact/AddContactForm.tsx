@@ -1,26 +1,45 @@
 import React from "react";
-import { Box, Button, MenuItem, Select } from "@mui/material";
-import { Form, Field } from "formik";
+import { Box, Button } from "@mui/material";
+import { Form } from "formik";
 import IntlMessages from "@zhava/utility/IntlMessages";
 import { Fonts } from "shared/constants/AppEnums";
 import AppTextField from "@zhava/core/AppFormComponents/AppTextField";
 import { ContactObj } from "../types";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
 import { useQuery } from "blitz";
-import getClients from "app/clients/queries/getClients";
 import { AppLoader } from "@zhava/index";
+import getClients from "app/modules/clients/backend/queries/getClients";
+import DiscountPart from "./Form/DiscountPart";
 
 interface AddContactFormProps {
   handleAddContactClose: () => void;
   values: ContactObj;
+  setFieldValue: (name: string, value: any) => void;
+  selectContact?: ContactObj | null;
 }
 
 const AddContactForm: React.FC<AddContactFormProps> = ({
   handleAddContactClose,
-  values
+  values,
+  setFieldValue,
+  selectContact
 }) => {
-  const [clients, { isLoading }] = useQuery(getClients, { status: 'all'});
+
+  const [clients, { isLoading }] = useQuery(getClients, {
+    where: {
+      where: {
+        isActive: true,
+        ...(selectContact?.id && {
+          NOT: [{
+            AND: [
+              { id: selectContact?.id },
+              { typeOfClient: "PERSON" },
+              ((selectContact?.parentId && selectContact?.parentId !== 0) ? { id: selectContact.parentId } : {}),
+            ]
+          }]
+        })
+      }
+    }
+  });
 
   if (isLoading) return <AppLoader />;
 
@@ -71,7 +90,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
               name="contact"
             />
 
-          <AppTextField
+            <AppTextField
               sx={{
                 mb: { xs: 4, xl: 6 },
                 width: "100%",
@@ -99,17 +118,21 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
         </Box>
 
         <AppTextField
-              sx={{
-                width: "100%",
-                mb: { xs: 4, xl: 6 },
-              }}
-              variant="outlined"
-              label={<IntlMessages id="common.email" />}
-              name="email"
+          sx={{
+            width: "100%",
+            mb: { xs: 4, xl: 6 },
+          }}
+          variant="outlined"
+          label={<IntlMessages id="common.email" />}
+          name="email"
         />
-
+      </Box>
+      <DiscountPart
+        clients={clients}
+        values={values}
+      />
+      <Box>
         <div>
-
           <AppTextField
             name="notes"
             multiline
@@ -122,51 +145,9 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
           />
         </div>
       </Box>
-
-
       <Box
         sx={{
-          pb: 4,
-          mx: -1,
-          textAlign: "right",
-        }}
-      >
-         <FormControl
-                  variant="outlined"
-                  sx={{
-                    width: "100%",
-                  }}
-                >
-          <InputLabel id="clients-select-outlined-clients">
-                معرف
-          </InputLabel>
-          <Field
-            name="parentId"
-            label="معرف"
-            labelId="clients-select-outlined-clients"
-            as={Select}
-            sx={{
-              width: "100%",
-              mb: { xs: 4, xl: 6 },
-            }}
-          >
-            {clients?.map((client) =>
-              <MenuItem
-                value={client.id}
-                key={client.id}
-                sx={{
-                  cursor: "pointer",
-                  }}
-                >
-                {client.name}
-              </MenuItem>
-            )}
-          </Field>
-          </FormControl>
-      </Box>
-
-      <Box
-        sx={{
+          mt: 5,
           pb: 4,
           mx: -1,
           textAlign: "right",

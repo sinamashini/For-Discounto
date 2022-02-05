@@ -1,34 +1,78 @@
-import React, { FC } from 'react';
+import React, { FC, createRef, useState } from 'react';
 import AppsContent from '@zhava/core/AppsContainer/AppsContent';
 import { DataGrid } from '@mui/x-data-grid';
-import InfoViewGraphql from '@zhava/core/AppInfoView/InfoGraphql';
 import contactsColumns from './columns';
 import { Box } from '@mui/material';
-import { Clients } from '@prisma/client';
-import { UpdateContactCache } from '../types';
+import { GetClientResult } from '../types';
+import AppsHeader from '@zhava/core/AppsContainer/AppsHeader';
+import { AppSearchBar } from '@zhava/index';
+import { useRouter } from 'blitz';
 
 interface Props {
-  clients: Clients[];
-  isLoading?: boolean;
-  error?: string;
+  clients: GetClientResult;
   deleteHandle: (id: number) => void;
-  handleAddOrUpdateContact: (client: UpdateContactCache, opration: 'add' | 'update') => void;
+  handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => void;
 }
 
-const ContatctsList: FC<Props> = ({ clients, isLoading, error, deleteHandle, handleAddOrUpdateContact }) => <InfoViewGraphql loading={isLoading} error={error as string}>
-  <AppsContent>
-    <Box sx={{ width: '100%', padding: 5 }}>
-      <DataGrid
-        rows={clients}
-        autoHeight
-        columns={contactsColumns({
-          handleDelete: deleteHandle,
-          handleAddOrUpdateContact
-        })}
-        density="comfortable"
-      />
-    </Box>
-  </AppsContent>
-</InfoViewGraphql>;
+const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateContact }) => {
+  const contentRef = createRef();
+  const [keyword, setKeyword] = useState('');
+
+  const router = useRouter();
+
+  const { status = "all" } = router.query;
+
+  const handleSearch = (filterText: string) => {
+    setKeyword(filterText);
+    setTimeout(() => router.push({
+      pathname: "/clients/[status]", query: {
+        status,
+        keyword: filterText
+      }
+    }), 1000);
+  }
+  return <Box
+    sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    ref={contentRef}
+  >
+    <AppsHeader>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: { xs: "100%", sm: "auto" },
+        }}
+      >
+        <Box sx={{ mr: 5 }}>
+          <AppSearchBar
+            iconPosition="right"
+            overlap={false}
+            value={keyword}
+            onChange={(event: any) => handleSearch(event.target.value)}
+            placeholder={"جستجوی کاربر"}
+          />
+        </Box>
+      </Box>
+    </AppsHeader>
+    <AppsContent sx={{ pt: 0 }}>
+      <Box sx={{ width: '100%', px: 0.5, pb: 5 }}>
+        <DataGrid
+          sx={{ border: 'unset', width: '100%' }}
+          rows={clients}
+          autoHeight
+          columns={contactsColumns({
+            handleDelete: deleteHandle,
+            handleAddOrUpdateContact
+          })}
+          density="comfortable"
+        />
+      </Box>
+    </AppsContent>
+  </Box>
+}
 
 export default ContatctsList;

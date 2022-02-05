@@ -1,11 +1,12 @@
-import React, {ReactNode} from 'react';
-import {AppScrollbar} from '../../../index';
+import { SxProps, Theme } from '@mui/material';
+import React, { ReactNode } from 'react';
+import { AppScrollbar } from '../../../index';
 
 interface AppsContentProps {
   children: ReactNode;
   isDetailView?: boolean;
   fullView?: boolean;
-
+  sx: SxProps<Theme>;
   [x: string]: any;
 }
 
@@ -14,6 +15,7 @@ const AppsContent: React.FC<AppsContentProps> = ({
   isDetailView,
   fullView,
   rest,
+  sx
 }) => {
   return (
     <AppScrollbar
@@ -31,6 +33,7 @@ const AppsContent: React.FC<AppsContentProps> = ({
         '& .simplebar-content': {
           height: '100%',
         },
+        ...sx
       }}
       {...rest}
     >

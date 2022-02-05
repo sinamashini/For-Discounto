@@ -1,5 +1,5 @@
+import { FormValidateError, GeneralErrors } from "shared/constants/ErrorsEnums";
 import { z } from "zod"
-import { GeneralErrors } from '../shared/constants/ErrorsEnums';
 
 export const name = z.string({required_error: GeneralErrors.REQUIRED});
 
@@ -9,15 +9,23 @@ export const nationalCode = z.string({required_error: GeneralErrors.REQUIRED}).r
   message: GeneralErrors.NATIONALCODE_FORMAT
 });
 
+
 export const AddClient = z.object({
-  email: z.string().email({message: GeneralErrors.EMAIL_FORMAT}).transform((str) => str.toLowerCase().trim()).optional(),
   name,
   contact,
   nationalCode,
   notes: z.string().optional(),
   address: z.string().optional(),
-  parentId: z.number().nullable()
+  parentId: z.number().nullable(),
+  email: z.string().email({ message: GeneralErrors.EMAIL_FORMAT }).transform((str) => str.toLowerCase().trim()).optional().nullable(),
 });
+
+export const ConfirmDiscount = z.object({
+  discountPercent: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).nonnegative({ message: FormValidateError.NEGATIVE }).min(0, { message: FormValidateError.MIN }).max(100, { message: FormValidateError.MAX }).default(0),
+  numberOfIncludedPeople: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).min(-1, { message: FormValidateError.MIN }).default(0),
+  // levelOfSearch: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).min(0, { message: FormValidateError.MIN }).default(1)
+});
+
 
 export const UpdateClient = z.object({
   id: z.number({ required_error: 'error' }),
@@ -51,5 +59,9 @@ export function checkNationalCode(input: string) {
 }
 
 export const GetClientId = z.object({
-  id: z.number(),
+  id: z.number({required_error: GeneralErrors.REQUIRED}),
 })
+
+export const GetLevelOfNestingOfUser = z.object({
+  level: z.number({ required_error: GeneralErrors.REQUIRED }),
+}).extend({ GetClientId });

@@ -8,12 +8,12 @@ export default resolver.pipe(resolver.zod(UpdateClient), async (input, ctx) => {
   await ctx.session.$authorize();
 
   const client = await db.clients.update({
-    where: {id: input.id},
+    where: { id: input.id },
     data: input.AddClient,
-    include: {introduced: true, parent: true}
+    include: { introduced: true, parent: true, gifts: true, _count: { select: { introduced: true } } }
   });
 
-  sendSingle('thanks', client.contact, { token: client.name });
+  // sendSingle('thanks', client.contact, { token: client.name });
 
   return client
 })

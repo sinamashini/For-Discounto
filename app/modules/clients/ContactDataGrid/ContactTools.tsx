@@ -4,22 +4,25 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { AppConfirmDialog, AppLoader } from '@zhava/index';
 import CreateContact from '../CreateContact';
-import { ContactObj, UpdateContactCache } from '../types';
+import { GetClientResult } from '../types';
 import { useMutation } from 'blitz';
-import deleteClient from 'app/clients/mutations/deleteClient';
+import deleteClient from 'app/modules/clients/backend/mutations/deleteClient';
 import { useDispatch } from 'react-redux';
 import { showMessage, fetchError } from 'app/redux/actions';
+import { mapedToSelectedContent } from '../backend/helpers';
+// import CalculateIcon from '@mui/icons-material/Calculate';
 
 interface Props {
-  client: ContactObj;
+  client: GetClientResult[0];
   onDelete: (id: number) => void;
-  onUpdate: (client: UpdateContactCache, opration: 'add' | 'update') => void;
+  onUpdate: (opration: 'add' | 'update', data: any) => void;
 }
 
 const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
   const [deleteContact, { isLoading }] = useMutation(deleteClient, {});
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+
   const dispatch = useDispatch();
 
   const deleteConfirm = async () => {
@@ -47,6 +50,11 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
         <DeleteIcon />
       </IconButton>
     </Tooltip>
+    {/* <Tooltip key="dis" title="اعمال تخفیف" arrow>
+          <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenModal(true)}>
+              <CalculateIcon />
+          </IconButton>
+    </Tooltip> */}
   </Stack>
     <AppConfirmDialog
       open={isDeleteDialogOpen}
@@ -57,7 +65,7 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
     />
     <CreateContact
       isAddContact={openEditDialog}
-      selectContact={client}
+      selectContact={mapedToSelectedContent(client)}
       onUpdateContact={onUpdate}
       handleAddContactClose={() => setOpenEditDialog(false)}
     />

@@ -12,7 +12,7 @@ export default async function getClientById(
 
   const data = GetClientId.parse(input);
 
-  const client = await db.clients.findFirst({ where: { id: data.id } });
+  const client = await db.clients.findFirst({ where: { id: data.id , isActive: true} });
 
   return client;
 }

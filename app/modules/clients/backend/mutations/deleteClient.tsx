@@ -7,6 +7,9 @@ export default resolver.pipe(resolver.zod(DeleteClient), async ({ id }, ctx) => 
   await ctx.session.$authorize();
 
   await db.clients.delete({ where: { id } });
+
   return 'Done!';
 })
+
+
 

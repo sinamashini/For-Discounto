@@ -1,31 +1,16 @@
 import db from "./index"
 
 const seed = async () => {
+  const clients = await db.clients.findMany({include: {discounts: {where: {status: 'ACTIVE'}}}});
 
-  const packageResult = await db.package.create({
-    data: {
-      name: 'معمولی',
-      discountOfEachLevelByPercent: 5,
-      numberOfNesting: 3,
-      createdAt: new Date()
-    }
-  });
-
-  //   await db.user.create({
-//     data: {
-//       name: 'پریسا مدیر', email: 'parisa@yahoo.com', hashedPassword: parisaHashed, role: "Admin"
-//     }
-//   });
-
-  const clients = await db.clients.findMany({});
-  await db.packageClient.createMany({
-    data: clients.map(client => ({
-      packageId: packageResult.id,
-      clientId: client.id,
-      discountOfEachLevelByPercent: 5,
-      numberOfNesting: 3,
-    }))
-  })
+  // for (let i = 0; i < clients.length; ++i) {
+  //   if (clients[i]?.discounts) {
+  //     const childs = clients[i]?.numberOfIndirectSubPeople! + clients[i]?.numberOfDiectSubPeople!;
+  //     const allDiscount = childs * clients[i]?.discounts[0]?.discountPercent!;
+  //     const legalDis = clients[i]?.discounts[0]?.discountPercent! * clients[i]?.discounts[0]?.numberOfIncludedPeople!;
+  //     await db.clients.update({ where: { id: clients[i]?.id }, data: { currentDiscount: allDiscount > legalDis ? legalDis: allDiscount } })
+  //   }
+  // }
 
 }
 

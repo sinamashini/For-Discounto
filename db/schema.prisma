@@ -23,7 +23,6 @@ model User {
   clients  Clients[]
   tokens   Token[]
   sessions Session[]
-  trash    ClientsTrash[]
   logs OpratorLogs[]
 }
 
@@ -49,10 +48,8 @@ model Token {
   type        TokenType
   expiresAt   DateTime
   sentTo      String
-
   user   User @relation(fields: [userId], references: [id])
   userId Int
-
   @@unique([hashedToken, type])
 }
 
@@ -61,12 +58,13 @@ enum TokenType {
 }
 
 model Clients {
-  id             Int      @id @default(autoincrement())
+  id             Int  @id @default(autoincrement())
   name           String
   contact        String
-  nationalCode   String  @unique
+  nationalCode   String?  @unique
+  typeOfClient   ClientType @default(PERSON)
   notes          String?
-  email          String? @unique
+  email          String?
   address        String?
   hashedPassword String?
   parentId       Int?
@@ -75,53 +73,42 @@ model Clients {
   createdAt      DateTime @default(now())
   userId Int?
   createdBy User? @relation(fields: [userId], references: [id])
-  packages PackageClient[]
-}
-
-model ClientsTrash {
-  id             Int   @id @default(autoincrement())
-  name           String
-  contact        String
-  nationalCode   String  @unique
-  notes          String?
-  email          String? @unique
-  address        String?
-  hashedPassword String?
-  parentName     String?
-  parentNationalCode String?
-  deletedAt      DateTime @default(now())
-  deletedBy User? @relation(fields: [userId], references: [id])
-  userId Int?
-  packageName String?
-}
-
-
-// ghablian barkhodar beshan ya az in be bad
-//aya mikhahid anhayi ke ghablan ham az in shrayat estefade kardand dobare sharayetshan no shavad?
-//soal baraye zamane update kardane package
-
-model Package {
-  id  Int  @id @default(autoincrement())
-  name String
-  numberOfNesting Int
-  discountOfEachLevelByPercent Int
-  description String?
-  createdAt DateTime @default(now())
-  clients PackageClient[]
-}
-
-model PackageClient {
-  package Package @relation(fields: [packageId], references: [id])
-  packageId Int
-  clinet Clients @relation(fields: [clientId], references: [id])
-  clientId Int
-  assignAt DateTime @default(now())
-  used Boolean @default(false)
-  discountOfEachLevelByPercent Int?
-  numberOfNesting Int?
-  discountForEver Int?
+  gifts Gifts[]
   isActive Boolean @default(true)
-  @@id([packageId, clientId])
+  packageClients PackagesClients[]
+  clientMapChild ClientsMap[] @relation("Child")
+  clientMapParent ClientsMap[] @relation("Parent")
+}
+
+model ClientsMap {
+    id Int  @id @default(autoincrement())
+    level Int @default(1)
+    child Clients? @relation("Child", fields: [childId], references: [id])
+    childId Int?
+    parent Clients? @relation("Parent", fields: [parentId], references: [id])
+    parentId Int?
+    status StatusEnum
+}
+
+enum ClientType {
+  PERSON
+  ORGANIZATION
+}
+
+enum StatusEnum {
+  ACTIVE
+  USED
+  HALF_USED
+  DEACTIVE
+}
+
+model Gifts {
+  id Int @id @default(autoincrement())
+  name String
+  content String
+  client Clients @relation(fields: [clientId], references: [id])
+  clientId Int
+  createdAt DateTime  @default(now())
 }
 
 model OpratorLogs {
@@ -130,4 +117,38 @@ model OpratorLogs {
   userId Int
   action String
   happend DateTime @default(now())
+}
+
+model Packages {
+  id  Int  @id @default(autoincrement())
+  name String
+  deadLineAfterMaxPayment Int?
+  maxPayment Int @default(0)
+  createdAt DateTime  @default(now())
+  packageClients PackagesClients[]
+  level PackageLevels[]
+  status PackageStatus
+  version Int @default(1)
+}
+
+enum PackageStatus {
+  ACTIVE
+  ARCHIVE
+}
+
+model PackagesClients {
+  client Clients @relation(fields: [clientId], references: [id])
+  clientId Int
+  package Packages @relation(fields: [packageId], references: [id])
+  packageId Int
+  status StatusEnum
+  @@id([clientId, packageId])
+}
+
+model PackageLevels {
+  id Int @id @default(autoincrement())
+  levelNumber Int @default(1)
+  percent Int @default(0)
+  packeges Packages @relation(fields: [packageId], references: [id])
+  packageId Int
 }
