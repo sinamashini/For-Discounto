@@ -1,4 +1,4 @@
-import { Clients, DiscountClient, Discounts } from "@prisma/client"
+import { Clients } from "@prisma/client"
 import getClients from "./backend/queries/getClients";
 
 export interface ContactObj  {

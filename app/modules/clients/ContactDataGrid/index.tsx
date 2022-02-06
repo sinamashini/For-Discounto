@@ -1,6 +1,6 @@
 import React, { FC, createRef, useState } from 'react';
 import AppsContent from '@zhava/core/AppsContainer/AppsContent';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridFilterPanel, GridToolbar } from '@mui/x-data-grid';
 import contactsColumns from './columns';
 import { Box } from '@mui/material';
 import { GetClientResult } from '../types';
@@ -68,6 +68,10 @@ const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateCont
             handleDelete: deleteHandle,
             handleAddOrUpdateContact
           })}
+          components={{
+            FilterPanel: GridFilterPanel,
+            Toolbar: GridToolbar,
+          }}
           density="comfortable"
         />
       </Box>

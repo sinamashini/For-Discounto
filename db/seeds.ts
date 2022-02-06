@@ -1,17 +1,10 @@
-import db from "./index"
+// seed scripts should be write there "seedScript/deleteEveryOne" and used here
+
+import db from "db"
 
 const seed = async () => {
-  const clients = await db.clients.findMany({include: {discounts: {where: {status: 'ACTIVE'}}}});
-
-  // for (let i = 0; i < clients.length; ++i) {
-  //   if (clients[i]?.discounts) {
-  //     const childs = clients[i]?.numberOfIndirectSubPeople! + clients[i]?.numberOfDiectSubPeople!;
-  //     const allDiscount = childs * clients[i]?.discounts[0]?.discountPercent!;
-  //     const legalDis = clients[i]?.discounts[0]?.discountPercent! * clients[i]?.discounts[0]?.numberOfIncludedPeople!;
-  //     await db.clients.update({ where: { id: clients[i]?.id }, data: { currentDiscount: allDiscount > legalDis ? legalDis: allDiscount } })
-  //   }
-  // }
-
+  const clients = await db.clientsMap.findMany({ where: { level: { gt: 1 } } });
+  await db.clientsMap.updateMany({ where: { id: { in: clients.map(item => item.id) } }, data: { level: { decrement: 1 } } });
 }
 
 export default seed

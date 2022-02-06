@@ -17,5 +17,6 @@ export enum FormValidateError {
   NATIONALCODE_FORMAT = "فرمت کدملی صحیح نیست",
   REQUIRED = "ورود این فیلد اجباری است",
   EMAIL_FORMAT = "فرمت ایمیل صحیح نیست",
+  DELETE_FORMAT = "مشکل در پاک کردن"
 }
 

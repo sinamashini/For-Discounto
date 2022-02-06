@@ -31,9 +31,6 @@ export const UpdateClient = z.object({
   id: z.number({ required_error: 'error' }),
 }).extend({ AddClient });
 
-export const DeleteClient = z.object({
-  id: z.number({ required_error: 'مشکل در پاک کردن کاربر' })
-})
 
 export function checkNationalCode(input: string) {
   if(input.length !== 10) return false;

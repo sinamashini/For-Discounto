@@ -1,23 +1,42 @@
 import { resolver, SecurePassword } from "blitz"
 import db from "db"
 import { AddClient } from "../validation"
+import { StatusEnum } from '@prisma/client';
 
-export default resolver.pipe(resolver.zod(AddClient), async (params, ctx) => {
+
+const addClient = async (params, ctx) => {
   await ctx.session.$authorize();
-  const input = AddClient.parse(params)
+  const input = AddClient.parse(params);
+
   const hashedPassword = await SecurePassword.hash(input.nationalCode.trim());
 
-  const client = await db.clients.create({
+  const addeClient = await db.clients.create({
     data: {
-      ...input, hashedPassword,
+      ...input,
+      hashedPassword,
       userId: ctx.session.userId,
-    },
-    include: { introduced: true, parent: true, gifts: true, _count: { select: { introduced: true } } }
+    }, include: { introduced: true, parent: true, gifts: true, _count: { select: { introduced: true } } },
   });
 
-  return client
-})
+  return addeClient;
+}
+
+const addToParent = async (client: Awaited<Promise<ReturnType<typeof addClient>>>) => {
+  if (client.parent) {
+    const parents = await db.clientsMap.findMany({ where: { childId: client.parentId } });
+    if (parents) {
+      await fillMapParents(parents, client);
+    }
+    await db.clientsMap.create({ data: { level: 1, parentId: client.parentId, childId: client.id, status: "ACTIVE" as StatusEnum } });
+  }
+  return client;
+}
 
 
+const fillMapParents = async (parents, client) => {
+  const addedQuery = parents.map(item => ({ level: item.level + 1, parentId: item.parentId, childId: client.id, status: "ACTIVE" as StatusEnum }))
+  await db.clientsMap.createMany({ data: addedQuery });
+}
 
 
+export default resolver.pipe(resolver.zod(AddClient), addClient, addToParent)
