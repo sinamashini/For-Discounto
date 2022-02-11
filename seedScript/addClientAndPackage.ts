@@ -5,7 +5,7 @@ export const addClientToPackage = async() => {
     data: {
       name: 'معمولی',
       deadLineAfterMaxPayment: 30,
-      maxPayment: 200000,
+      maxPayment: 1000000,
       version: 1,
       status: 'ACTIVE',
       level: {

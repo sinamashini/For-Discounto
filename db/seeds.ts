@@ -1,11 +1,8 @@
 // seed scripts should be write there "seedScript/deleteEveryOne" and used here
-
-import db from "db"
+import { addClientToPackage } from "seedScript/addClientAndPackage"
 
 const seed = async () => {
-  await db.packagesClients.deleteMany({ where: { packageId: 2 } });
-  await db.packageLevels.deleteMany({where: { packageId: 2 } });
-  await db.packages.delete({ where: { id: 2 } });
+  await addClientToPackage()
 }
 
 export default seed
