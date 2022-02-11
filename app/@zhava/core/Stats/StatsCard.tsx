@@ -56,7 +56,7 @@ const StatsCard: React.FC<Props> = ({
               fontFamily: "IRANYekan(FaNum)",
               fontSize: 17,
               mr: 3,
-              color: parseInt(value) > 100 ? 'red' : '#000000'
+              color: '#000000'
             }}
           >
             {value}

@@ -10,9 +10,6 @@ import addClient from "./backend/mutations/addClient";
 import updateClient from "./backend/mutations/updateClient";
 import { useDispatch } from "react-redux";
 import { fetchError, fetchStart, fetchSuccess, showMessage } from "app/redux/actions";
-import { orderBy } from 'lodash';
-import { Discounts } from "@prisma/client";
-import { DiscountWarning } from "shared/constants/WarningEnums";
 import { GeneralErrors } from "shared/constants/ErrorsEnums";
 // import getPaginatedClients from "./backend/queries/getPaginatedClients";
 import { mapStatusOfContact, createWhereQuery } from "./backend/helpers";
@@ -96,22 +93,6 @@ const Contact = () => {
       return [];
     });
   }
-
-  // const updatedClientAddToCache = (client: typeof clients[0]) => {
-  //   setQueryData((data) => {
-  //     if (data) {
-  //       const newData = [...data];
-  //       return newData.map(item => {
-  //         if (item.id === client.id) {
-  //           item = client;
-  //         }
-  //         return item;
-  //       })
-  //     }
-  //     return [client];
-  //   }
-  //   );
-  // }
 
 
   const addClientToCache = (client: typeof clients[0]) => {

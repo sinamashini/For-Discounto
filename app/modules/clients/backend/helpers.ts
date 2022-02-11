@@ -29,5 +29,6 @@ export const mapedToSelectedContent = (client: GetClientResult[0]): ContactObj =
   notes: client?.notes ?? '',
   parentId: client.parentId ?? undefined,
   email: client?.email ?? '',
+  packageId: client?.packageClients[0]?.packageId ?? undefined
 })
 

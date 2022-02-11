@@ -9,6 +9,7 @@ export interface ContactObj  {
   contact: string;
   notes?: string;
   parentId?: number | null;
+  packageId?: number | null;
   address?: string;
 }
 

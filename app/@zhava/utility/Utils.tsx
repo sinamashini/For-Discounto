@@ -107,7 +107,6 @@ export const getUserFromAuth0 = (user: any) => {
 };
 
 export const getUserFromFirebase = (user: any) => {
-  // console.log("user: ", user);
   if (user)
     return {
       id: 1,

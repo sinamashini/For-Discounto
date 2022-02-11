@@ -32,7 +32,6 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
           NOT: [{
             AND: [
               { id: selectContact?.id },
-              { typeOfClient: "PERSON" },
               ((selectContact?.parentId && selectContact?.parentId !== 0) ? { id: selectContact.parentId } : {}),
             ]
           }]
@@ -129,6 +128,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       </Box>
       <DiscountPart
         clients={clients}
+        selectContact={selectContact}
         values={values}
       />
       <Box>

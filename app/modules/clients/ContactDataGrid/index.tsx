@@ -68,10 +68,6 @@ const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateCont
             handleDelete: deleteHandle,
             handleAddOrUpdateContact
           })}
-          components={{
-            FilterPanel: GridFilterPanel,
-            Toolbar: GridToolbar,
-          }}
           density="comfortable"
         />
       </Box>

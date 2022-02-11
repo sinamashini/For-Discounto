@@ -7,8 +7,6 @@ export const sendSingle = (template, receptor, params) => {
     ...(params.token3 && { token3: params.token3 })
   };
   const goh = { ...tokens };
-  console.log(goh);
-  console.log(template, receptor);
   SMSApi.Send({
     receptor,
     template,

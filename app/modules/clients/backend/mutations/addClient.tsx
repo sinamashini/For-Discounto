@@ -1,7 +1,8 @@
-import { resolver, SecurePassword } from "blitz"
+import { Ctx, resolver, SecurePassword } from "blitz"
 import db from "db"
 import { AddClient } from "../validation"
-import { StatusEnum } from '@prisma/client';
+import { Clients, StatusEnum } from '@prisma/client';
+import addUserLog from "app/logger/mutations/addUserLog";
 
 
 const addClient = async (params, ctx) => {
@@ -21,8 +22,14 @@ const addClient = async (params, ctx) => {
   return addeClient;
 }
 
-const addToParent = async (client: Awaited<Promise<ReturnType<typeof addClient>>>) => {
-  if (client.parent) {
+const addToParentHandler = async (client: Awaited<Promise<ReturnType<typeof addClient>>>, ctx: Ctx) => {
+  const clientToUpdate = await addParent(client);
+  await addUserLog({ action: 'ثبت مشتری جدید' }, ctx);
+  return clientToUpdate;
+}
+
+export const addParent = async (client: Awaited<Promise<ReturnType<typeof addClient>>> | Clients) => {
+  if (client.parentId) {
     const parents = await db.clientsMap.findMany({ where: { childId: client.parentId } });
     if (parents) {
       await fillMapParents(parents, client);
@@ -33,10 +40,11 @@ const addToParent = async (client: Awaited<Promise<ReturnType<typeof addClient>>
 }
 
 
+
 const fillMapParents = async (parents, client) => {
   const addedQuery = parents.map(item => ({ level: item.level + 1, parentId: item.parentId, childId: client.id, status: "ACTIVE" as StatusEnum }))
   await db.clientsMap.createMany({ data: addedQuery });
 }
 
 
-export default resolver.pipe(resolver.zod(AddClient), addClient, addToParent)
+export default resolver.pipe(resolver.zod(AddClient), addClient, addToParentHandler)

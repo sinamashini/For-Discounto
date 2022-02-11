@@ -3,8 +3,9 @@
 import db from "db"
 
 const seed = async () => {
-  const clients = await db.clientsMap.findMany({ where: { level: { gt: 1 } } });
-  await db.clientsMap.updateMany({ where: { id: { in: clients.map(item => item.id) } }, data: { level: { decrement: 1 } } });
+  await db.packagesClients.deleteMany({ where: { packageId: 2 } });
+  await db.packageLevels.deleteMany({where: { packageId: 2 } });
+  await db.packages.delete({ where: { id: 2 } });
 }
 
 export default seed

@@ -33,15 +33,16 @@ const CreateContact: FC<CreateContactProps> = ({
       <Formik
         validateOnChange={true}
         initialValues={{
-          name: selectContact ? selectContact.name : 'مارکار آقاجانیان',
-          email: selectContact ? selectContact.email : undefined,
-          contact: selectContact ? selectContact.contact : '09126547893',
+          name: selectContact ? selectContact.name : '',
+          email: selectContact ? selectContact.email === '' ? undefined : selectContact.email : undefined,
+          contact: selectContact ? selectContact.contact : '',
           address:
             selectContact && selectContact.address ? selectContact.address : '',
           notes:
             selectContact && selectContact.notes ? selectContact.notes : '',
-          nationalCode: selectContact && selectContact.nationalCode ? selectContact.nationalCode : '0926553682',
+          nationalCode: selectContact && selectContact.nationalCode ? selectContact.nationalCode : '',
           parentId: selectContact && selectContact.parentId ? selectContact.parentId : null,
+          packageId: selectContact && selectContact.packageId ? selectContact.packageId : null,
         }}
         validationSchema={toFormikValidationSchema(AddClient)}
         onSubmit={async (data, { setSubmitting, resetForm }) => {

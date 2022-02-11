@@ -17,13 +17,13 @@ export const AddClient = z.object({
   notes: z.string().optional(),
   address: z.string().optional(),
   parentId: z.number().nullable(),
-  email: z.string().email({ message: GeneralErrors.EMAIL_FORMAT }).transform((str) => str.toLowerCase().trim()).optional().nullable(),
+  email: z.string().email({ message: GeneralErrors.EMAIL_FORMAT }).transform((str) => str?.toLowerCase().trim()).optional()
 });
 
 export const ConfirmDiscount = z.object({
-  discountPercent: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).nonnegative({ message: FormValidateError.NEGATIVE }).min(0, { message: FormValidateError.MIN }).max(100, { message: FormValidateError.MAX }).default(0),
-  numberOfIncludedPeople: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).min(-1, { message: FormValidateError.MIN }).default(0),
-  // levelOfSearch: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).min(0, { message: FormValidateError.MIN }).default(1)
+  clientId: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }),
+  childIds: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).array(),
+  price: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }),
 });
 
 
