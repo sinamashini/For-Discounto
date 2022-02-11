@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: blitzapp
+    env: node
+    plan: free
+    buildCommand:
+      yarn --frozen-lockfile --prod=false &&
+      blitz prisma generate &&
+      blitz build &&
+      blitz prisma migrate deploy
+    startCommand: blitz start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: postgresql://sina:postgres@dpg-c83dsmb19n0dsdksgvrg:5432/zhava
+        fromDatabase:
+          name: zhava
+          property: connectionString
+      - key: 285d58936075ea6f0b447c2268caf514
+        generateValue: true
+
+databases:
+  - name: zhava
+    plan: free
