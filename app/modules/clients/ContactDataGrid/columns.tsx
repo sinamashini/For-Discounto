@@ -1,20 +1,17 @@
 import { Typography } from "@mui/material";
 import { GridRenderCellParams } from "@mui/x-data-grid";
-import { UpdateContactCache } from "../types";
 import ContactTools from "./ContactTools";
-
 interface ColsInput {
-  handleAddOrUpdateContact: (client: UpdateContactCache, opration: 'add' | 'update') => void;
+  handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => void;
   handleDelete: (id: number) => void
 }
 
-const contactsColumns = ({handleAddOrUpdateContact, handleDelete}: ColsInput) => [
+const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) => [
   {
     field: 'id',
     headerName: 'ID',
     hide: true,
     width: 200,
-    filterable: false,
   },
   {
     field: 'name',
@@ -24,12 +21,13 @@ const contactsColumns = ({handleAddOrUpdateContact, handleDelete}: ColsInput) =>
   {
     field: 'contact',
     headerName: 'تلفن',
-    width: 200,
+    width: 100,
   },
   {
     field: 'nationalCode',
     headerName: 'کد ملی',
-    width: 200,
+    hide: false,
+    width: 100,
   },
   {
     field: 'parent',
@@ -38,7 +36,7 @@ const contactsColumns = ({handleAddOrUpdateContact, handleDelete}: ColsInput) =>
     renderCell: (params: GridRenderCellParams) => {
       const parentName = params.row?.parent?.name;
       if (parentName) return <>{parentName}</>;
-      return <Typography variant="body1" sx={{color: 'orange'}}>ندارد</Typography>
+      return <Typography variant="body1" sx={{ color: 'orange' }}>ندارد</Typography>
     }
   },
   {
@@ -52,8 +50,7 @@ const contactsColumns = ({handleAddOrUpdateContact, handleDelete}: ColsInput) =>
       onDelete={handleDelete}
       onUpdate={handleAddOrUpdateContact}
     />
-  }
-
+  },
 ]
 
 export default contactsColumns;

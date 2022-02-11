@@ -1,5 +1,5 @@
+import { FormValidateError, GeneralErrors } from "shared/constants/ErrorsEnums";
 import { z } from "zod"
-import { GeneralErrors } from '../shared/constants/ErrorsEnums';
 
 export const name = z.string({required_error: GeneralErrors.REQUIRED});
 
@@ -9,23 +9,28 @@ export const nationalCode = z.string({required_error: GeneralErrors.REQUIRED}).r
   message: GeneralErrors.NATIONALCODE_FORMAT
 });
 
+
 export const AddClient = z.object({
-  email: z.string().email({message: GeneralErrors.EMAIL_FORMAT}).transform((str) => str.toLowerCase().trim()).optional(),
   name,
   contact,
   nationalCode,
   notes: z.string().optional(),
   address: z.string().optional(),
-  parentId: z.number().nullable()
+  parentId: z.number().nullable(),
+  email: z.string().email({ message: GeneralErrors.EMAIL_FORMAT }).transform((str) => str?.toLowerCase().trim()).optional()
 });
+
+export const ConfirmDiscount = z.object({
+  clientId: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }),
+  childIds: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }).array(),
+  price: z.number({ invalid_type_error: FormValidateError.NUMBER, required_error: FormValidateError.REQUIRED }),
+});
+
 
 export const UpdateClient = z.object({
   id: z.number({ required_error: 'error' }),
 }).extend({ AddClient });
 
-export const DeleteClient = z.object({
-  id: z.number({ required_error: 'مشکل در پاک کردن کاربر' })
-})
 
 export function checkNationalCode(input: string) {
   if(input.length !== 10) return false;
@@ -50,3 +55,10 @@ export function checkNationalCode(input: string) {
   return (sum < 2 && check == sum) || (sum >= 2 && check + sum == 11);
 }
 
+export const GetClientId = z.object({
+  id: z.number({required_error: GeneralErrors.REQUIRED}),
+})
+
+export const GetLevelOfNestingOfUser = z.object({
+  level: z.number({ required_error: GeneralErrors.REQUIRED }),
+}).extend({ GetClientId });

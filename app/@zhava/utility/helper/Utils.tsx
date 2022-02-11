@@ -38,7 +38,6 @@ export const multiPropsFilter = (
           filters[key].includes(keyEle)
         );
       }
-      // console.log("key", key, filters[key], product[key]);
       if (key === stringKey) {
         return product[key].toLowerCase().includes(filters[key].toLowerCase());
       }
