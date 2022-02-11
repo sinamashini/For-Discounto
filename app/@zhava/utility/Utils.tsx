@@ -44,7 +44,6 @@ export const multiPropsFilter = (
           filters[key].includes(keyEle)
         );
       }
-      // console.log("key", key, filters[key], product[key]);
       if (key === stringKey) {
         return product[key].toLowerCase().includes(filters[key].toLowerCase());
       }
@@ -108,7 +107,6 @@ export const getUserFromAuth0 = (user: any) => {
 };
 
 export const getUserFromFirebase = (user: any) => {
-  // console.log("user: ", user);
   if (user)
     return {
       id: 1,

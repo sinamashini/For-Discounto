@@ -1,17 +1,89 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import AppsContainer from "@zhava/core/AppsContainer";
 import SideBarContent from "./ContactSideBar";
 import ContatctsList from "./ContactDataGrid";
 import { AppInfoView } from "@zhava/index";
-import { useQuery, useRouter } from "blitz";
-import getClients from "app/clients/queries/getClients";
-import { Clients } from "@prisma/client";
+import { useMutation, useQuery, useRouter } from "blitz";
+import getClients, { GetClientsQuery } from "./backend/queries/getClients";
+import addClient from "./backend/mutations/addClient";
+import updateClient from "./backend/mutations/updateClient";
+import { useDispatch } from "react-redux";
+import { fetchError, fetchStart, fetchSuccess, showMessage } from "app/redux/actions";
+import { GeneralErrors } from "shared/constants/ErrorsEnums";
+// import getPaginatedClients from "./backend/queries/getPaginatedClients";
+import { mapStatusOfContact, createWhereQuery } from "./backend/helpers";
+
+
+
+const createSearchQueryForClient = (keyword: string): GetClientsQuery => {
+  return {
+    where: {
+      isActive: true,
+      OR: [
+        { nationalCode: { contains: keyword } },
+        { name: { contains: keyword } },
+        { contact: { contains: keyword } },
+      ]
+    }
+  }
+}
 
 const Contact = () => {
   const { messages } = useIntl();
   const { query } = useRouter();
-  const [clients, { isLoading, error, setQueryData }] = useQuery(getClients, { status: query.status as string });
+
+  const { status = "all", keyword = "" } = query;
+
+  const mapedStatus = mapStatusOfContact(status as string);
+
+  const conditions = createWhereQuery(mapedStatus);
+
+  const where = createSearchQueryForClient(keyword as string)
+
+  const [clients, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
+    where: {
+      where: {
+        ...where.where,
+        ...conditions
+      }
+    }
+  });
+
+  const [addContact] = useMutation(addClient);
+  const [updateContact] = useMutation(updateClient);
+
+  const dispatch = useDispatch();
+
+
+  if (isLoading && !isFetching) {
+    dispatch(fetchStart())
+  }
+
+  if (!isLoading) {
+    dispatch(fetchSuccess())
+  }
+
+  if (error) {
+    dispatch(fetchError(GeneralErrors.UNEXPECTED));
+  }
+
+  const addClientHandler = async (data: any) => {
+    const addedResult = await addContact(data);
+    dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
+    refetch()
+  }
+
+  const updateClientHandler = async (data: any) => {
+    const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
+    refetch();
+    dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+  }
+
+  const handleAddOrUpdateContact = async (opration: 'add' | 'update', data: any) => {
+    const oprationHnadler = { add: addClientHandler, update: updateClientHandler };
+    oprationHnadler[opration](data);
+  }
 
   const handleDelete = (id: number) => {
     setQueryData((data) => {
@@ -22,29 +94,17 @@ const Contact = () => {
     });
   }
 
-  const handleAddOrUpdateContact = async (client: typeof clients[0], opration: 'add' | 'update') => {
-    setQueryData((data) => {
-      if (opration === 'add' ) {
-        if (data) {
-          return [...[client], ...data];
-        }
-        return [client];
-      } else if(opration === 'update') {
-        if (data) {
-          const newData = [...data ];
-          return newData.map(item => {
-            if (item.id === client.id) {
-              item = client;
-            }
-            return item;
-          })
-        }
+
+  const addClientToCache = (client: typeof clients[0]) => {
+    setQueryData(data => {
+      if (data) {
+        return [...[client], ...data];
       }
-      return [client];
+      return [client]
     })
   }
 
-  return (
+  return (<>
     <AppsContainer
       title={messages["contactApp.contact"]}
       fullView={false}
@@ -52,13 +112,12 @@ const Contact = () => {
     >
       <ContatctsList
         clients={clients}
-        isLoading={isLoading}
-        error={error as string}
         deleteHandle={handleDelete}
         handleAddOrUpdateContact={handleAddOrUpdateContact}
       />
-      <AppInfoView />
     </AppsContainer>
+    <AppInfoView />
+  </>
   );
 };
 

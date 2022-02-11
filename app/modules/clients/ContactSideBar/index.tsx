@@ -12,18 +12,19 @@ import SidebarPlaceholder from "@zhava/core/AppSkeleton/SidebarListSkeleton";
 import AddIcon from "@mui/icons-material/Add";
 import { Zoom } from "@mui/material";
 import { UpdateContactCache } from "../types";
+import { AppInfoView } from "@zhava/index";
 
 const folderList = [
-  { id: 1, alias: 'all', name: 'همه', path: '/clients/all'},
-  { id: 2, alias: 'discount', name: 'دارای معرف', path: '/clients/has-parent'},
+  { id: 1, alias: 'all', name: 'همه', path: '/clients/all' },
+  { id: 2, alias: 'discount', name: 'دارای معرف', path: '/clients/has-parent' },
   { id: 3, alias: 'noDiscount', name: 'بدون معرف', path: '/clients/no-parent' },
 ]
 
 interface Props {
-  onUpdateContact:(client: UpdateContactCache, opration: 'add' | 'update') => void;
+  onUpdateContact: (opration: 'add' | 'update', data: any) => void;
 }
 
-const SideBarContent: FC<Props> = ({onUpdateContact}) => {
+const SideBarContent: FC<Props> = ({ onUpdateContact }) => {
   const [isAddContact, onSetIsAddContact] = useState(false);
 
   const handleAddContactOpen = () => {
@@ -54,10 +55,10 @@ const SideBarContent: FC<Props> = ({onUpdateContact}) => {
                 fontSize: 26,
               },
             }}
-            startIcon={<AddIcon />}
+            startIcon={<AddIcon sx={{ ml: 2 }} />}
             onClick={handleAddContactOpen}
           >
-            <IntlMessages id="contactApp.createContact" />
+            اضافه کردن مراجع
           </Button>
         </Zoom>
       </Box>
@@ -108,6 +109,7 @@ const SideBarContent: FC<Props> = ({onUpdateContact}) => {
             handleAddContactClose={handleAddContactClose}
           />
         </Box>
+        <AppInfoView />
       </AppScrollbar>
     </>
   );

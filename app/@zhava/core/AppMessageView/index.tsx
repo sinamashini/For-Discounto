@@ -100,7 +100,7 @@ const AppMessageView: React.FC<AppMessageViewProps> = (props) => {
       }}
       open={open}
       onClose={onClose}
-      autoHideDuration={3500}
+      autoHideDuration={5000}
       TransitionComponent={TransitionLeft}
     >
       <SnackbarContent
