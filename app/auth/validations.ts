@@ -1,5 +1,7 @@
+import { nationalCode } from "app/modules/clients/backend/validation"
 import { GeneralErrors } from "shared/constants/ErrorsEnums"
 import { z } from "zod"
+import { Role } from 'types';
 
 export const email = z
   .string({required_error: GeneralErrors.REQUIRED })
@@ -15,7 +17,24 @@ export const password = z
 export const Signup = z.object({
   email,
   password,
+  nationalCode: nationalCode,
+  name: z.string(),
+  contact: z.string(),
+  role: z.string()
 })
+
+export const AddUser = z.object({
+  email,
+  nationalCode: nationalCode,
+  name: z.string(),
+  contact: z.string(),
+  role: z.string()
+})
+
+export const UpdateUser = AddUser.merge(z.object({
+  id: z.number()
+}))
+
 
 export const Login = z.object({
   email,

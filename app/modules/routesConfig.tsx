@@ -1,6 +1,9 @@
 import { FiUsers } from 'react-icons/fi';
-import {ReactNode} from 'react';
-import {RoutePermittedRole} from '../shared/constants/AppConst';
+import { FaUsersCog } from 'react-icons/fa';
+
+import { ReactNode } from 'react';
+import { RoutePermittedRole } from '../shared/constants/AppConst';
+
 
 export interface RouterConfigData {
   id: string;
@@ -17,23 +20,56 @@ export interface RouterConfigData {
   as?: string;
 }
 
-const routesConfig: RouterConfigData[] = [
-  {
-    id: 'app',
-    title: 'Application',
-    messageId: 'sidebar.application',
-    type: 'group',
-    children: [
-      {
-        id: 'crypto',
-        title: 'Crypto',
-        messageId: 'sidebar.app.dashboard.client',
-        type: 'item',
-        icon: <FiUsers />,
-        url: '/clients/all',
-      },
-    ],
-  },
-];
+export interface RouterConfigDataRole {
+  User: RouterConfigData[],
+  Admin: RouterConfigData[],
+}
+
+const routesConfig: RouterConfigDataRole = {
+  User: [
+    {
+      id: 'app',
+      title: 'Application',
+      messageId: 'sidebar.application',
+      type: 'group',
+      children: [
+        {
+          id: 'crypto',
+          title: 'Crypto',
+          messageId: 'sidebar.app.dashboard.client',
+          type: 'item',
+          icon: <FiUsers />,
+          url: '/clients/all',
+        },
+      ],
+    },
+  ],
+  Admin: [
+    {
+      id: 'app',
+      title: 'Application',
+      messageId: 'sidebar.application',
+      type: 'group',
+      children: [
+        {
+          id: 'crypto',
+          title: 'Crypto',
+          messageId: 'sidebar.app.dashboard.client',
+          type: 'item',
+          icon: <FiUsers />,
+          url: '/clients/all',
+        },
+        {
+          id: 'crypto',
+          title: 'Crypto',
+          messageId: 'مدیریت کارکنان',
+          type: 'item',
+          icon: <FaUsersCog />,
+          url: '/users/all',
+        },
+      ],
+    },
+  ]
+};
 
 export default routesConfig;

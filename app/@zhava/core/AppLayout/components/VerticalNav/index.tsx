@@ -7,8 +7,12 @@ import routesConfig, {
 import NavVerticalGroup from "./VerticalNavGroup";
 import VerticalCollapse from "./VerticalCollapse";
 import VerticalItem from "./VerticalItem";
+import { useSession } from "blitz";
 
 const VerticalNav = () => {
+  const user = useSession()
+  if (!user?.role) return <></>;
+
   return (
     <List
       sx={{
@@ -17,7 +21,7 @@ const VerticalNav = () => {
       }}
       component="div"
     >
-      {routesConfig.map((item: RouterConfigData) => (
+      {routesConfig[user?.role!].map((item: RouterConfigData) => (
         <React.Fragment key={item.id}>
           {item.type === "group" && <NavVerticalGroup item={item} level={0} />}
 

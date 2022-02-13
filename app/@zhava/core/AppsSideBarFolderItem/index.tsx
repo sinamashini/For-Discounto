@@ -17,14 +17,17 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LabelImportantIcon from '@mui/icons-material/LabelImportant';
-import {alpha, styled} from '@mui/material/styles';
-import {Fonts} from '../../../shared/constants/AppEnums';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { alpha, styled } from '@mui/material/styles';
+import { Fonts } from '../../../shared/constants/AppEnums';
 import clsx from 'clsx';
 import { useRouter } from 'blitz';
 import DoNotDisturbIcon from '@mui/icons-material/DoNotDisturb';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AccessibilityIcon from '@mui/icons-material/Accessibility';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 
-const AppsSideBarFolderList = styled(ListItem)(({theme}) => {
+const AppsSideBarFolderList = styled(ListItem)(({ theme }) => {
   return {
     padding: '7px 16px',
     borderRadius: '0 30px 30px 0',
@@ -104,6 +107,12 @@ const getIconByName = (name: string, active: boolean) => {
       return <CheckCircleIcon />;
     case 'noDiscount':
       return <DoNotDisturbIcon />;
+    case 'admin':
+      return <AdminPanelSettingsIcon />;
+    case 'user':
+      return <AccessibilityIcon />;
+    case 'editor':
+      return <SupervisorAccountIcon />
     default:
       return <PersonOutlinedIcon />;
   }
@@ -118,7 +127,7 @@ const AppsSideBarFolderItem: React.FC<AppsSideBarFolderItemProps> = ({
   item,
   path,
 }) => {
-  const {asPath} = useRouter();
+  const { asPath } = useRouter();
 
   return (
     <Link href={path}>

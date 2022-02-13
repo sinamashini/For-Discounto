@@ -19,7 +19,9 @@ model User {
   name           String?
   email          String   @unique
   hashedPassword String?
+  contact String?
   role           String   @default("USER")
+  nationalCode String? @unique
   clients  Clients[]
   tokens   Token[]
   sessions Session[]
