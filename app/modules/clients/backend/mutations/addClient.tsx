@@ -3,7 +3,7 @@ import db from "db"
 import { AddClient } from "../validation"
 import { Clients, StatusEnum } from '@prisma/client';
 import addUserLog from "app/logger/mutations/addUserLog";
-
+import { omit } from 'lodash';
 
 const addClient = async (params, ctx) => {
   await ctx.session.$authorize();
@@ -11,15 +11,24 @@ const addClient = async (params, ctx) => {
 
   const hashedPassword = await SecurePassword.hash(input.nationalCode.trim());
 
-  const addeClient = await db.clients.create({
+  const { packageId } = input;
+
+  const addInput = omit(input, packageId);
+
+
+  const { name, contact, nationalCode, notes, address, parentId, email } = input;
+
+  const addedClient = await db.clients.create({
     data: {
-      ...input,
+      name, contact, nationalCode, notes, address, parentId, email,
       hashedPassword,
       userId: ctx.session.userId,
     }, include: { introduced: true, parent: true, gifts: true, _count: { select: { introduced: true } } },
   });
 
-  return addeClient;
+  await db.packagesClients.create({ data: { clientId: addedClient.id, packageId, status: "ACTIVE" } })
+
+  return addedClient;
 }
 
 const addToParentHandler = async (client: Awaited<Promise<ReturnType<typeof addClient>>>, ctx: Ctx) => {

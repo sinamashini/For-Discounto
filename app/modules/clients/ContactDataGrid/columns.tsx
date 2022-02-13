@@ -44,7 +44,7 @@ const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) 
     headerName: 'ابزار',
     filterable: false,
     sortable: false,
-    width: 150,
+    width: 300,
     renderCell: (params: GridRenderCellParams) => <ContactTools
       client={params.row}
       onDelete={handleDelete}

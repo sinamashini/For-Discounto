@@ -34,7 +34,6 @@ const calculatePrices = async (clientId: number, packageId: number) => {
   const relatedCopy: any[] = [...relatedClients];
 
   const prices = relatedCopy?.map(client => client.child?.buyHistory?.map((history) => ({ clientId: client.childId, price: history.price, level: client.level }))).filter(item => item.length);
-
   let sumPrices = 0
   prices.length && prices.map(item => item[0]).forEach(item => {
     sumPrices += item.price;
@@ -70,7 +69,9 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
   const [openSubSetModal, setOpenSubSetModal] = useState(false);
 
   const handleDiscount = async () => {
+    console.log(client);
     const packagesOfUser = client.packageClients;
+    console.log('packages', packagesOfUser);
     if (packagesOfUser && packagesOfUser[0]) {
       const discount = await calculatePrices(client.id, packagesOfUser[0]?.packageId)
       setDiscountObject(discount)
@@ -105,22 +106,17 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
         <AttachMoneyIcon />
       </IconButton>
     </Tooltip>
-    {/* <Tooltip key="delete" title="حذف" arrow>
-      <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => setDeleteDialogOpen(true)}>
-        <DeleteIcon />
-      </IconButton>
-    </Tooltip> */}
     <Tooltip key="subs" title="لیست زیر مجموعه ها" arrow>
       <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenSubSetModal(true)}>
         <PeopleAltIcon />
       </IconButton>
     </Tooltip>
-
-    <Tooltip key="dis" title="اعمال تخفیف" arrow>
+    <Tooltip key="dissss" title="اعمال تخفیف" arrow>
       <IconButton color="primary" aria-label="" component="span" onClick={() => handleDiscount()}>
         <CalculateIcon />
       </IconButton>
     </Tooltip>
+
   </Stack>
     <AppConfirmDialog
       open={isDeleteDialogOpen}
