@@ -1,12 +1,16 @@
 import { AddUser } from "app/auth/validations";
-import { resolver, SecurePassword } from "blitz";
+import { resolver, SecurePassword, Ctx } from "blitz";
 import db from "db";
 
+const authorize = (input, ctx: Ctx) => {
+  ctx.session.$authorize('ADMIN');
+  return input;
+}
 
 export default resolver.pipe(
   resolver.zod(AddUser),
-  resolver.authorize("ADMIN"),
-  async (userParams, ctx) => {
+  authorize,
+  async (userParams, ctx: Ctx) => {
     const hashedPassword = await SecurePassword.hash(userParams.nationalCode.trim())
 
     const user = await db.user.create({
@@ -16,6 +20,8 @@ export default resolver.pipe(
         hashedPassword,
       },
     })
+
+    console.log(user);
 
     return user;
   }

@@ -12,29 +12,32 @@ import UserCols from './datagrid/UserCols';
 
 const UsersList: FC = () => {
   const contentRef = createRef();
-  const [keyword, setKeyword] = useState('');
   const router = useRouter();
-  const { role = "all" } = router.query
+  const { role = "all", keyword = '' } = router.query
+
+  const searchKeyword = (keyword as string).trim();
 
   const [users, { isLoading }] = useQuery(getAllUsers, {
     where: {
       ...(role !== 'all' && { role: role as Role }),
-      OR: [
-        { name: keyword, },
-        { nationalCode: keyword },
-        { contact: keyword },
-        { email: keyword }]
+      ...(searchKeyword && {
+        OR: [
+          { name: searchKeyword, },
+          { nationalCode: searchKeyword },
+          { contact: searchKeyword },
+          { email: searchKeyword }]
+      })
     }
   })
 
-  if (isLoading) return <AppLoader />
+  const [localKeyword, setLocalKeyword] = useState(searchKeyword);
 
   const handleSearch = (filterText: string) => {
-    setKeyword(filterText);
+    setLocalKeyword(filterText.trim());
     setTimeout(() => router.push({
-      pathname: "/clients/[status]", query: {
-        status,
-        keyword: filterText
+      pathname: "/users/[role]", query: {
+        role,
+        keyword: filterText.trim()
       }
     }), 1000);
   }
@@ -58,7 +61,7 @@ const UsersList: FC = () => {
           <AppSearchBar
             iconPosition="right"
             overlap={false}
-            value={keyword}
+            value={localKeyword}
             onChange={(event: any) => handleSearch(event.target.value)}
             placeholder={"جستجوی کارمند"}
           />
@@ -66,14 +69,17 @@ const UsersList: FC = () => {
       </Box>
     </AppsHeader>
     <AppsContent sx={{ pt: 0 }}>
-      <Box sx={{ width: '100%', px: 0.5, pb: 5 }}>
-        <DataGrid
-          sx={{ border: 'unset', width: '100%' }}
-          rows={users}
-          autoHeight
-          columns={UserCols}
-          density="comfortable"
-        />
+
+      <Box sx={{ width: '100%', px: 0.5, pb: 5, position: 'relative' }}>
+        {isLoading ? <AppLoader /> :
+          <DataGrid
+            sx={{ border: 'unset', width: '100%' }}
+            rows={users}
+            autoHeight
+            columns={UserCols}
+            density="comfortable"
+          />
+        }
       </Box>
     </AppsContent>
   </Box>

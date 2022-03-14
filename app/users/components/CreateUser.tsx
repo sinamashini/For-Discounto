@@ -1,19 +1,20 @@
 import React, { FC } from 'react';
 import { Field, Form, Formik } from 'formik';
 import AppDialog from '@zhava/core/AppDialog';
-import { AddClient } from 'app/modules/clients/backend/validation';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { GeneralErrors } from 'shared/constants/ErrorsEnums';
-import { fetchError, fetchStart } from 'app/redux/actions';
+import { fetchError, fetchStart, showMessage } from 'app/redux/actions';
 import { useDispatch } from 'react-redux';
 import { User } from '@prisma/client';
 import { Fonts } from 'shared/constants/AppEnums';
 import AppTextField from '@zhava/core/AppFormComponents/AppTextField';
 import { Box, FormControl, InputLabel, MenuItem, Select, Button } from '@mui/material';
 import { keys } from 'lodash';
-import { useMutation } from 'blitz';
+import { useMutation, useRouter } from 'blitz';
 import updateUser from '../mutations/updateUser';
 import addUser from '../mutations/addUser';
+import { AddUser } from 'app/auth/validations';
+import { addToUsersCache, updateUsersCache } from '../updateUserQuerCache';
 
 const roles = {
   USER: 'اپراتور',
@@ -35,9 +36,10 @@ const CreateContact: FC<CreateContactProps> = ({
   onUpdateUser,
 }) => {
   const dispatch = useDispatch();
-
   const [add] = useMutation(addUser);
   const [update] = useMutation(updateUser);
+  const router = useRouter();
+  const { query } = router;
 
   return (
     <AppDialog
@@ -52,32 +54,32 @@ const CreateContact: FC<CreateContactProps> = ({
           email: selectUser ? selectUser.email : '',
           contact: selectUser ? selectUser.contact : '',
           nationalCode: selectUser ? selectUser.nationalCode : '',
-          role: selectUser ? selectUser.role : "USER"
+          role: selectUser ? selectUser.role : ''
         }}
-        validationSchema={toFormikValidationSchema(AddClient)}
+        validationSchema={toFormikValidationSchema(AddUser)}
         onSubmit={async (data, { setSubmitting, resetForm }) => {
           try {
             setSubmitting(true);
             dispatch(fetchStart());
             const opration = selectUser !== undefined ? 'update' : 'add';
-            if (onUpdateUser) {
-              if (opration === 'add') {
-                await add(data as any);
-                resetForm();
-              } else {
-                if (selectUser?.id) {
-                  await update({ id: selectUser?.id, ...data } as any);
-                }
-              }
+            if (opration === 'add') {
+              const res = await add(data as any);
+              await addToUsersCache(query, res);
+              resetForm();
+            }
+            if (opration === 'update') {
+              await update({ id: selectUser?.id, ...data } as any);
+              await addToUsersCache(query, { id: selectUser?.id, ...data });
             }
             handleAddUserClose()
+            dispatch(showMessage('کارمند با موفقیت اضافه شد'));
             setSubmitting(false);
           } catch (err) {
             dispatch(fetchError(GeneralErrors.UNEXPECTED))
           }
         }}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, isSubmitting, errors }) => (
           <Form noValidate autoComplete="off">
             <Box
               sx={{
@@ -167,7 +169,7 @@ const CreateContact: FC<CreateContactProps> = ({
                   </InputLabel>
                   <Field
                     name="role"
-                    label="پکیج"
+                    label="role"
                     labelId="packages-select-outlined-packages"
                     as={Select}
                     sx={{
@@ -189,14 +191,14 @@ const CreateContact: FC<CreateContactProps> = ({
                   </Field>
                 </FormControl>
               </Box>
-              <Button type="submit" variant="contained" color="info">
+              <Button type="submit" disabled={isSubmitting} variant="contained" color="info">
                 ثبت
               </Button>
             </Box>
           </Form>
         )}
       </Formik>
-    </AppDialog>
+    </AppDialog >
   );
 };
 

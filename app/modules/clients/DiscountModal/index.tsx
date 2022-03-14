@@ -68,7 +68,7 @@ const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, s
         <StatsCard
           icon={'/assets/images/dashboard/icon-avg-cost.svg'}
           bgColor="#1bcc38b3"
-          value={discountPrice?.toString() + "  ریال  "}
+          value={0?.toString() + "  ریال  "}
           heading={"تخفیف تا این لحظه"}
         />
       </Grid>
@@ -80,7 +80,7 @@ const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, s
       <Button variant="outlined" color="info" onClick={() => handleDiscount()}>تایید و اعمال تخفیف</Button>
     </Box>
     <AppInfoView />
-  </AppDialog>
+  </ApptDialog>
 }
 
 export default DiscountModal;

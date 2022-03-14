@@ -1,7 +1,6 @@
 import { nationalCode } from "app/modules/clients/backend/validation"
 import { GeneralErrors } from "shared/constants/ErrorsEnums"
 import { z } from "zod"
-import { Role } from 'types';
 
 export const email = z
   .string({required_error: GeneralErrors.REQUIRED })

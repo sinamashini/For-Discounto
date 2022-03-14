@@ -69,9 +69,7 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
   const [openSubSetModal, setOpenSubSetModal] = useState(false);
 
   const handleDiscount = async () => {
-    console.log(client);
     const packagesOfUser = client.packageClients;
-    console.log('packages', packagesOfUser);
     if (packagesOfUser && packagesOfUser[0]) {
       const discount = await calculatePrices(client.id, packagesOfUser[0]?.packageId)
       setDiscountObject(discount)

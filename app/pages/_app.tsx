@@ -24,6 +24,7 @@ import { globalStyles } from "app/core/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import createEmotionCache from 'app/core/components/emotion/createEmotionCache';
+import { Box } from '@mui/material';
 
 const GlobalDiv = styled('div')`
   * {
@@ -54,34 +55,34 @@ export default function App(
   const store = useStore(pageProps.initialReduxState);
 
   return (
-    <Suspense fallback={<AppLoader />}>
-      <CacheProvider value={emotionCache}>
-        <CssBaseline />
-        <ErrorBoundary
-          FallbackComponent={RootErrorFallback}
-          onReset={useQueryErrorResetBoundary().reset}
-        >
-          {globalStyles}
-          <Head>
-            <title>ژاوا</title>
-            <meta name='viewport' content='initial-scale=1, width=device-width' />
-          </Head>
-          <AppContextProvider>
-            <Provider store={store}>
-              <AppThemeProvider>
-                <AppStyleProvider>
-                  <AppLocaleProvider>
-                    <GlobalDiv>
+    <CacheProvider value={emotionCache}>
+      <CssBaseline />
+      <ErrorBoundary
+        FallbackComponent={RootErrorFallback}
+        onReset={useQueryErrorResetBoundary().reset}
+      >
+        {globalStyles}
+        <Head>
+          <title>ژاوا</title>
+          <meta name='viewport' content='initial-scale=1, width=device-width' />
+        </Head>
+        <AppContextProvider>
+          <Provider store={store}>
+            <AppThemeProvider>
+              <AppStyleProvider>
+                <AppLocaleProvider>
+                  <GlobalDiv>
+                    <Suspense fallback={false} >
                       <Component {...pageProps} />
-                    </GlobalDiv>
-                  </AppLocaleProvider>
-                </AppStyleProvider>
-              </AppThemeProvider>
-            </Provider>
-          </AppContextProvider>
-        </ErrorBoundary>
-      </CacheProvider>
-    </Suspense>
+                    </Suspense>
+                  </GlobalDiv>
+                </AppLocaleProvider>
+              </AppStyleProvider>
+            </AppThemeProvider>
+          </Provider>
+        </AppContextProvider>
+      </ErrorBoundary>
+    </CacheProvider>
   );
 }
 

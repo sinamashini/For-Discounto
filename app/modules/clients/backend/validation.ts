@@ -30,7 +30,6 @@ export const ConfirmDiscount = z.object({
 
 export const UpdateClient = z.object({
   id: z.number({ required_error: 'error' }),
-
 }).extend({ AddClient });
 
 

@@ -6,10 +6,11 @@ import { User } from '@prisma/client';
 import { AppLoader } from '@zhava/index';
 import { AppConfirmDialog } from '@zhava/index';
 import CreateUser from '../CreateUser';
-import { useMutation } from 'blitz';
+import { useMutation, useRouter } from 'blitz';
 import { useDispatch } from 'react-redux';
 import { fetchError, showMessage } from 'app/redux/actions';
 import deleteUser from 'app/users/mutations/deleteUser';
+import { updateCacheAfterDelete } from 'app/users/updateUserQuerCache';
 
 interface Props {
   user: User;
@@ -19,6 +20,7 @@ const UserTools: FC<Props> = ({ user }) => {
   const [deleteContact, { isLoading }] = useMutation(deleteUser, {});
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+  const { query } = useRouter();
 
   const dispatch = useDispatch();
 
@@ -26,6 +28,7 @@ const UserTools: FC<Props> = ({ user }) => {
     try {
       if (user.id) {
         await deleteContact({ id: user.id });
+        await updateCacheAfterDelete(query, user.id);
         dispatch(showMessage('کاربر حذف شد'));
       }
     } catch (error) {
