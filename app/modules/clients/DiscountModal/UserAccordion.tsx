@@ -44,16 +44,29 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 interface Props {
-  clients: Clients[]
+  clients: Clients[];
+  infosAboutClients: { clientId: number, percent: number, price: number, name: string }[]
 }
 
-const UserAccordion: React.FC<Props> = ({ clients }) => {
+const UserAccordion: React.FC<Props> = ({ clients, infosAboutClients }) => {
   const [expanded, setExpanded] = React.useState<string | false>(false);
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
     };
+
+  const preRenderedData = infosAboutClients.map(user => {
+    const findedUser = clients.filter(item => item?.id === user?.clientId);
+    return {
+      ...user,
+      ...(findedUser && { sumPrices: findedUser.reduce(getSum) }),
+    }
+  });
+
+  const getSum = (total, num) => total + num;
+
+  console.log(preRenderedData)
 
   return (
     <div>

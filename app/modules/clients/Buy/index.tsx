@@ -75,6 +75,8 @@ const BuyModal: FC<Props> = ({ setOpenModal, openModal, client }) => {
                 </Box>
 
                 <div>
+
+                  {values.price ? <b>{values.price.toLocaleString()} ریال</b> : null}
                   <AppTextField
                     sx={{
                       width: "100%",

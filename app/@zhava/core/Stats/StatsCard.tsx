@@ -7,8 +7,9 @@ import { Fonts } from "shared/constants/AppEnums";
 interface Props {
   icon: string;
   bgColor?: string;
-  value: string;
+  value: string | JSX.Element;
   heading: any;
+  variant?: "outlined" | "contained"
 }
 
 const StatsCard: React.FC<Props> = ({
@@ -16,12 +17,14 @@ const StatsCard: React.FC<Props> = ({
   bgColor,
   value,
   heading,
+  variant = "contained"
 }) => {
   return (
     <AppCard
       sxStyle={{
         borderRadius: 4,
-        ...(bgColor && { backgroundColor: bgColor })
+        ...(bgColor && variant === "outlined" && { border: `1px dotted ${bgColor}` }),
+        ...(bgColor && variant === "contained" && { backgroundColor: bgColor })
       }}
       className="card-hover"
     >

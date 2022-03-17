@@ -33,30 +33,41 @@ const calculatePrices = async (clientId: number, packageId: number) => {
 
   const relatedCopy: any[] = [...relatedClients];
 
-  const prices = relatedCopy?.map(client => client.child?.buyHistory?.map((history) => ({ clientId: client.childId, price: history.price, level: client.level }))).filter(item => item.length);
-  let sumPrices = 0
-  prices.length && prices.map(item => item[0]).forEach(item => {
-    sumPrices += item.price;
-  })
+  const prices = relatedCopy?.map(client => client.child?.buyHistory?.map((history) => ({
+    clientId: client.childId,
+    price: history.price,
+    level: client.level
+  }))).filter(item => item.length);
 
-  const { discount, burnedChilds } = await caclculateDiscount(packageId, prices)
-  return { sumPrices, subsetNumber: relatedClients.length, discount, burnedChilds };
+  let sumPrices = 0;
+
+  prices.map(item => item.forEach(c => sumPrices += c.price));
+
+  const { discount, burnedChilds, remainPrice, childerenWithPriceAndPrecent } = await caclculateDiscount(packageId, prices)
+
+  return { sumPrices, subsetNumber: relatedClients.length, discount, burnedChilds, remainPrice, childerenWithPriceAndPrecent };
 }
 
 const caclculateDiscount = async (packageId: number, clientsWithPrices: any[]) => {
   const clientPackage = await invoke(getPackages, { query: { where: { id: packageId }, include: { level: true } } });
   let discount = 0;
   let burnedChilds: any = [];
-  clientsWithPrices.map(item => item[0]).forEach(child => {
+  let childerenWithPriceAndPrecent: any = [];
+  clientsWithPrices.map(item => item.forEach(child => {
     if (clientPackage) {
       const levelPercent = clientPackage[0]?.level.filter(item => item.levelNumber === child.level);
       if (levelPercent && clientPackage[0] && levelPercent[0] && discount <= clientPackage[0].maxPayment) {
         discount += calculatePercent(child.price, levelPercent[0].percent)
+        if (discount >= clientPackage[0].maxPayment) {
+          discount = clientPackage[0].maxPayment
+        }
+        childerenWithPriceAndPrecent.push({ clientId: child.clientId, percent: levelPercent[0].percent, price: child.price })
         burnedChilds.push(child.clientId);
       }
     }
-  })
-  return { discount, burnedChilds }
+  }));
+
+  return { discount, burnedChilds, remainPrice: clientPackage[0]?.maxPayment! - discount, childerenWithPriceAndPrecent }
 }
 
 const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
@@ -146,6 +157,8 @@ const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
         discountPrice={discountObject.discount}
         sumPrices={discountObject.sumPrices}
         burnedChildren={discountObject.burnedChilds}
+        remainPrice={discountObject.remainPrice}
+        childerenWithPriceAndPrecent={discountObject.childerenWithPriceAndPrecent}
       />
     }
   </>

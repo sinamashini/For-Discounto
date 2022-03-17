@@ -11,6 +11,12 @@ import { useDispatch } from 'react-redux';
 import { fetchError, fetchStart, showMessage } from 'app/redux/actions';
 import { GeneralErrors } from 'shared/constants/ErrorsEnums';
 import getClients from '../backend/queries/getClients';
+import { styled } from '@mui/material/styles';
+
+const Rial = styled('span')`
+  font-size: 13px;
+  font-weight: bold;
+`
 
 interface DiscountProps {
   setOpenModal: (value: boolean) => void;
@@ -19,9 +25,11 @@ interface DiscountProps {
   sumPrices: number;
   discountPrice: number;
   subsetNumber: number;
+  remainPrice: number;
   burnedChildren: any[];
+  childerenWithPriceAndPrecent: any[];
 }
-const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, sumPrices, discountPrice, subsetNumber, burnedChildren }) => {
+const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, sumPrices, discountPrice, subsetNumber, burnedChildren, remainPrice, childerenWithPriceAndPrecent }) => {
 
   const [confirmDiscount] = useMutation(doTheDiscount);
 
@@ -30,6 +38,8 @@ const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, s
   const dispatch = useDispatch();
 
   if (isLoading) return <AppLoader />;
+
+  const infosAboutClients = childerenWithPriceAndPrecent.map(item => ({ ...item, name: clientInDiscount.find(clients => clients.id === item.clientId)?.name }));
 
   const handleDiscount = async () => {
     try {
@@ -60,27 +70,36 @@ const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, s
         <StatsCard
           icon={'/assets/images/dashboard/total-clients.svg'}
           bgColor="#e2e7f1"
-          value={sumPrices?.toString()}
+          value={<>{sumPrices?.toLocaleString()}{' '}<Rial> ریال  </Rial></>}
           heading={"میزان خرید زیرمجموعه ها"}
         />
       </Grid>
       <Grid item xs={12} sm={12} sx={{ mt: 5 }}>
         <StatsCard
-          icon={'/assets/images/dashboard/icon-avg-cost.svg'}
+          icon={'/discountPriceassets/images/dashboard/icon-avg-cost.svg'}
           bgColor="#1bcc38b3"
-          value={0?.toString() + "  ریال  "}
+          value={<>{discountPrice?.toLocaleString()}{' '}<Rial>  ریال  </Rial></>}
           heading={"تخفیف تا این لحظه"}
         />
       </Grid>
+      <Grid item xs={12} sm={12} sx={{ mt: 5 }}>
+        <StatsCard
+          icon={'/discountPriceassets/images/dashboard/icon-avg-cost.svg'}
+          bgColor="#cc1b88b3"
+          value={<>{remainPrice?.toLocaleString()}{' '}<Rial>  ریال  </Rial></>}
+          variant="outlined"
+          heading={"میزان باقی مانده تخفیف که بلا استفاده خواهد ماند"}
+        />
+      </Grid>
       <Box sx={{ width: '100%', mt: 5 }}>
-        <UserAccordion clients={clientInDiscount} />
+        <UserAccordion clients={clientInDiscount} infosAboutClients={infosAboutClients} />
       </Box>
     </Grid>
     <Box sx={{ mt: 5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Button variant="outlined" color="info" onClick={() => handleDiscount()}>تایید و اعمال تخفیف</Button>
     </Box>
     <AppInfoView />
-  </ApptDialog>
+  </AppDialog>
 }
 
 export default DiscountModal;
