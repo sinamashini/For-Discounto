@@ -1,16 +1,15 @@
-import { nationalCode } from "app/modules/clients/backend/validation"
+import { nationalCode } from "app/clients/backend/validation"
 import { GeneralErrors } from "shared/constants/ErrorsEnums"
 import { z } from "zod"
 
 export const email = z
-  .string({required_error: GeneralErrors.REQUIRED })
-  .email({message: GeneralErrors.EMAIL_FORMAT})
+  .string({ required_error: GeneralErrors.REQUIRED })
+  .email({ message: GeneralErrors.EMAIL_FORMAT })
   .transform((str) => str.toLowerCase().trim())
 
 export const password = z
-  .string()
-  .min(10)
-  .max(100)
+  .string({ required_error: GeneralErrors.REQUIRED })
+  .min(10, 'تعداد کارکترهای رمز عبور باید از ۹ بیشتر باشد')
   .transform((str) => str.trim())
 
 export const Signup = z.object({
@@ -34,6 +33,7 @@ export const UpdateUser = AddUser.merge(z.object({
   id: z.number()
 }))
 
+export const EditUserSelfAccount = AddUser.omit({ role: true });
 
 export const Login = z.object({
   email,
@@ -56,7 +56,7 @@ export const ResetPassword = z
   })
 
 export const ChangePassword = z.object({
-  currentPassword: z.string(),
+  currentPassword: z.string({ required_error: GeneralErrors.REQUIRED }),
   newPassword: password,
 })
 

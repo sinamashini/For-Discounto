@@ -3,6 +3,7 @@ export interface ObjPackage {
   name: string;
   maxPayment: number;
   deadLineAfterMaxPayment?: number;
+  numberOfPeopleIncluded?: number;
   level: LevelObject[];
 }
 

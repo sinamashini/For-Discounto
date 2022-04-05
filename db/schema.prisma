@@ -129,6 +129,7 @@ model Packages {
   name String
   deadLineAfterMaxPayment Int?
   maxPayment Int @default(0)
+  numberOfPeopleIncluded Int @default(0)
   createdAt DateTime  @default(now())
   packageClients PackagesClients[]
   level PackageLevels[]
@@ -161,6 +162,7 @@ model PackageLevels {
 model BuyHistory {
     id Int @id @default(autoincrement())
     price Int @default(0)
+    priceWithDiscount Int @default(0)
     description String?
     createdAt DateTime  @default(now())
     updatedAt DateTime @updatedAt

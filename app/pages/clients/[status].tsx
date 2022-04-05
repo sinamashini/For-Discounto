@@ -1,9 +1,17 @@
-import React from 'react';
-import AppPage from '@zhava/hoc/AppPage';
-import asyncComponent from '@zhava/utility/asyncComponent';
+import Contact from '../../clients/Page';
+import Layouts from "@zhava/core/AppLayout/Layouts";
+import { useLayoutContext } from "@zhava/utility/AppContextProvider/LayoutContextProvider";
+import { BlitzPage } from "blitz";
 
-const Status = asyncComponent(() => import('../../modules/clients'));
+const ClientStatus: BlitzPage = () => {
+  const { navStyle } = useLayoutContext();
+  const AppLayout = Layouts[navStyle];
 
-const PageStatus =  AppPage(() => <Status />);
+  return <AppLayout>
+    <Contact />
+  </AppLayout>
+}
 
-export default PageStatus;
+ClientStatus.authenticate = { redirectTo: '/signin' };
+
+export default ClientStatus
