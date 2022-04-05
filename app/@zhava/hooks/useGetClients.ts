@@ -1,5 +1,5 @@
-import { createWhereQuery, mapStatusOfContact } from "app/modules/clients/backend/helpers";
-import getClients, { GetClientsQuery } from "app/modules/clients/backend/queries/getClients";
+import { createWhereQuery, mapStatusOfContact } from "app/clients/backend/helpers";
+import getClients, { GetClientsQuery } from "app/clients/backend/queries/getClients";
 import { useQuery, useRouter } from "blitz";
 
 const createSearchQueryForClient = (keyword: string): GetClientsQuery => {
@@ -15,7 +15,7 @@ const createSearchQueryForClient = (keyword: string): GetClientsQuery => {
   }
 }
 
-export const useGetClient = ({enabled=true}) => {
+export const useGetClient = ({ enabled = true }) => {
   const { query } = useRouter();
 
   const { status = "all", keyword = "" } = query;
@@ -27,7 +27,7 @@ export const useGetClient = ({enabled=true}) => {
 
   const where = createSearchQueryForClient(keyword as string)
 
-  const [result, { setQueryData, isFetching, isLoading , refetch, error}] = useQuery(getClients, {
+  const [result, { setQueryData, isFetching, isLoading, refetch, error }] = useQuery(getClients, {
     where: {
       where: {
         ...where.where,
@@ -36,5 +36,5 @@ export const useGetClient = ({enabled=true}) => {
     }
   }, { enabled })
 
-  return {result, setQueryData, isLoading, isFetching, refetch, error}
+  return { result, setQueryData, isLoading, isFetching, refetch, error }
 }

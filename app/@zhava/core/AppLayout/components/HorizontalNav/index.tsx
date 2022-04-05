@@ -12,7 +12,7 @@ import routesConfig, {
 const HorizontalNav = () => {
   return (
     <List className="navbarNav">
-      {routesConfig.User.map((item: RouterConfigData) => (
+      {routesConfig.USER.map((item: RouterConfigData) => (
         <React.Fragment key={item.id}>
           {item.type === "group" && (
             <HorizontalGroup item={item} nestedLevel={0} />

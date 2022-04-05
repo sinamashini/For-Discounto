@@ -33,6 +33,12 @@ export const Columns = [
     renderCell: (params: GridRenderCellParams) => <Typography sx={{ fontSize: '16px' }}>{params.value} {' '} روز</Typography>
   },
   {
+    field: 'numberOfPeopleIncluded',
+    headerName: "تعداد افراد مجاز",
+    width: 120,
+    renderCell: (params: GridRenderCellParams) => <Typography sx={{ fontSize: '16px' }}>{params.value}</Typography>
+  },
+  {
     field: 'level',
     headerName: 'سطوح',
     width: 100,

@@ -21,8 +21,6 @@ export default resolver.pipe(
       },
     })
 
-    console.log(user);
-
     return user;
   }
 )

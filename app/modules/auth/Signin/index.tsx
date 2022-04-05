@@ -7,7 +7,7 @@ import AppLogo from "@zhava/core/AppLayout/components/AppLogo";
 const Signin = () => {
   return (
     <AuthWrapper>
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ width: "100%", mt: 20 }}>
         <Box sx={{ mb: { xs: 6, xl: 8 } }}>
           <Box
             sx={{

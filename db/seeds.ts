@@ -1,8 +1,8 @@
 // seed scripts should be write there "seedScript/deleteEveryOne" and used here
-import { addClientToPackage } from "seedScript/addClientAndPackage"
+import addClients from "seedScript/addClients";
 
 const seed = async () => {
-  await addClientToPackage()
+  await addClients()
 }
 
 export default seed

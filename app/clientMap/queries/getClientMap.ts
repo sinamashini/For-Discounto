@@ -1,5 +1,5 @@
 import { resolver } from "blitz"
-import db, {Prisma} from "db"
+import db, { Prisma } from "db"
 
 export interface GetMapClientsQuery extends Pick<Prisma.ClientsMapFindManyArgs, "where" | "include" | "orderBy" | "skip" | "take"> { }
 

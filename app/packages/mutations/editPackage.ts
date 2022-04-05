@@ -3,7 +3,6 @@ import { Ctx, resolver } from "blitz"
 import db from "db";
 import { EditPackage } from "../validation";
 import { addPackageFn } from "./addPackage";
-import { omit, pick } from 'lodash';
 import { z } from "zod";
 import { Packages, PackageLevels } from '@prisma/client'
 
@@ -24,18 +23,14 @@ export default resolver.pipe(resolver.zod(EditPackage), resolver.authorize('ADMI
   }
 });
 
-const generateNewVersion = async(params: z.infer<typeof EditPackage>) => {
+const generateNewVersion = async (params: z.infer<typeof EditPackage>) => {
   const findedPackage = await db.packages.findUnique({ where: { id: params.id } });
   const version = findedPackage?.version ? findedPackage?.version + 1 : 1;
-  return { ...params, version };
+  await db.packages.update({ where: { id: params.id }, data: { status: 'ARCHIVE' } });
+  return { params: { ...params, version }, oldId: params.id };
 };
 
-export const updateTheOldPackageStatus = async(params: z.infer<typeof EditPackage>) => {
-  await db.packages.update({ where: { id: params.id }, data: { status: 'ARCHIVE' } });
-  return params;
-}
-
-export const versioningThePackage = resolver.pipe(resolver.zod(EditPackage), generateNewVersion, updateTheOldPackageStatus, addPackageFn, updateUsersPackge);
+export const versioningThePackage = resolver.pipe(generateNewVersion, addPackageFn, updateUsersPackge);
 
 
 export interface UpdateLevelsProps {
@@ -53,7 +48,7 @@ export const updateLevels = async (input: UpdateLevelsProps, ctx) => {
     const levelsAreSame = editedPackage.level.length === levels.length && editedPackage.level.every((value, index) => value === levels[index]);
     if (!levelsAreSame) {
       await db.packageLevels.deleteMany({ where: { packageId: id } });
-      await db.packageLevels.createMany({ data: levels.map(item  => ({ packageId: id, ...item }))});
+      await db.packageLevels.createMany({ data: levels.map(item => ({ packageId: id, ...item })) });
     }
   }
 
@@ -62,13 +57,14 @@ export const updateLevels = async (input: UpdateLevelsProps, ctx) => {
   return editedPackage;
 }
 
-export const editedPackage = resolver.pipe(resolver.zod(EditPackage), async(params, ctx) => {
-  const { name, maxPayment, deadLineAfterMaxPayment, id } = params;
+export const editedPackage = resolver.pipe(resolver.zod(EditPackage), async (params, ctx) => {
+  const { name, maxPayment, deadLineAfterMaxPayment, id, numberOfPeopleIncluded } = params;
   const editedPackage = await db.packages.update({
     where: { id },
     data: {
       name,
       maxPayment,
+      numberOfPeopleIncluded,
       deadLineAfterMaxPayment,
     },
     include: { level: true },

@@ -37,6 +37,7 @@ const CreatePackage: FC<CreatePackageProps> = ({
           maxPayment: selectPackage ? selectPackage.maxPayment : 0,
           deadLineAfterMaxPayment: selectPackage ? selectPackage.deadLineAfterMaxPayment : 0,
           levels: selectPackage ? selectPackage.level : undefined,
+          numberOfPeopleIncluded: selectPackage ? selectPackage.numberOfPeopleIncluded : 0,
         }}
         validationSchema={toFormikValidationSchema(AddPackage)}
         onSubmit={async (data, { setSubmitting, resetForm }) => {
@@ -122,6 +123,18 @@ const CreatePackage: FC<CreatePackageProps> = ({
                     variant="outlined"
                     label="مدت زمان استفاده (روز)"
                     name="deadLineAfterMaxPayment"
+                  />
+                </div>
+                <div>
+                  <AppTextField
+                    sx={{
+                      width: "100%",
+                      mb: { xs: 4, xl: 6 },
+                    }}
+                    type="number"
+                    variant="outlined"
+                    label="تعداد افراد مجاز"
+                    name="numberOfPeopleIncluded"
                   />
                 </div>
                 <LevelInput levelsOfPackage={values.levels} setlevelsOfPackage={setFieldValue} setFieldError={setFieldError} setFieldTouched={setFieldTouched} />

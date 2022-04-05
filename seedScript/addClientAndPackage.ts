@@ -1,12 +1,13 @@
 import db from "db";
 
-export const addClientToPackage = async() => {
+export const addClientToPackage = async () => {
   const packagesToAdd = await db.packages.create({
     data: {
       name: 'معمولی',
       deadLineAfterMaxPayment: 30,
       maxPayment: 1000000,
       version: 1,
+      numberOfPeopleIncluded: 5,
       status: 'ACTIVE',
       level: {
         createMany: {

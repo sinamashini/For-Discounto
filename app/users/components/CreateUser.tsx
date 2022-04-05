@@ -14,7 +14,7 @@ import { useMutation, useRouter } from 'blitz';
 import updateUser from '../mutations/updateUser';
 import addUser from '../mutations/addUser';
 import { AddUser } from 'app/auth/validations';
-import { addToUsersCache, updateUsersCache } from '../updateUserQuerCache';
+import { addToUsersCache } from '../updateUserQuerCache';
 
 const roles = {
   USER: 'اپراتور',
