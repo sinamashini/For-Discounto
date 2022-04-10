@@ -28,7 +28,7 @@ const PackageTools: FC<Props> = ({ id, packages }) => {
       dispatch(fetchStart())
       await delPac({ id });
       dispatch(showMessage('پکیج با موفقیت حذف شد'))
-      invalidateQuery(getPackages);
+      await invalidateQuery(getPackages);
     } catch (err) {
       dispatch(fetchError(err.message))
     }
@@ -40,7 +40,7 @@ const PackageTools: FC<Props> = ({ id, packages }) => {
       const levels = packages.level.map(item => ({ levelNumber: item.levelNumber, percent: item.percent }));
       const copyPackage = { ...packages, name: `${packages.name} کپی`, createdAt: new Date(), version: 1, levels };
       await createCopyPackage(copyPackage as any);
-      invalidateQuery(getPackages);
+      await invalidateQuery(getPackages);
       dispatch(showMessage('پکیج با موفقیت ایجاد شد'))
     } catch (err) {
       dispatch(fetchError(err.message))
@@ -71,7 +71,6 @@ const PackageTools: FC<Props> = ({ id, packages }) => {
         <FileCopyIcon />
       </IconButton>
     </Tooltip>
-
   </Stack>
     <AppConfirmDialog
       open={isDeleteDialogOpen}

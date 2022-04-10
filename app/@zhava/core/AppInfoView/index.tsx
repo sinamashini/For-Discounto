@@ -37,7 +37,6 @@ const AppInfoView = () => {
 export default AppInfoView;
 
 function RootErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps, customError?: string) {
-  console.log('here:', error)
   if (error instanceof AuthenticationError) {
     return <LoginForm onSuccess={resetErrorBoundary} />
   } else if (error instanceof AuthorizationError) {

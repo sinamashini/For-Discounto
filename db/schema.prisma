@@ -82,6 +82,8 @@ model Clients {
   clientMapParent ClientsMap[] @relation("Parent")
   buyHistory BuyHistory[]
   discounts DiscountHistory[]
+  remainDiscountAmount Int @default(0)
+  burnedDiscountAmount Int @default(0)
 }
 
 model ClientsMap {

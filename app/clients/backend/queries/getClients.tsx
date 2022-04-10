@@ -22,6 +22,7 @@ export default async function getClients(input: z.infer<typeof GetClients>, { se
       parent: true,
       introduced: { include: { introduced: true } },
       gifts: true,
+      discounts: { orderBy: { createdAt: 'desc' } },
       packageClients: { where: { status: "ACTIVE" }, take: 1, include: { package: { include: { level: true } } } },
       _count: { select: { introduced: true } }
     },

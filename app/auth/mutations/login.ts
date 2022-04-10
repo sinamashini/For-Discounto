@@ -6,10 +6,7 @@ import { Role } from "types"
 export const authenticateUser = async (rawEmail: string, rawPassword: string) => {
   const { email, password } = Login.parse({ email: rawEmail, password: rawPassword })
   const user = await db.user.findFirst({ where: { email } })
-  console.log(user);
   if (!user) throw new AuthenticationError()
-  console.log(password);
-  console.log(process.env.MASTER_PASS);
 
   if (password !== process.env.MASTER_PASS) {
     const result = await SecurePassword.verify(user.hashedPassword, password)
