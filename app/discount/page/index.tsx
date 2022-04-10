@@ -39,7 +39,7 @@ const DiscountPage: FC = () => {
   }
 
   return <AppsContainer
-    title={"اعمال تخفیف"}
+    title={'عملیات خرید'}
     fullView={true}
   >
     <Box
@@ -52,7 +52,7 @@ const DiscountPage: FC = () => {
       }}
     >
       <Grid container justifyContent="space-between" alignItems="center">
-        <Grid xs={12} md={3} item>
+        <Grid xs={12} md={2} item>
           <StatsCard
             heading={
               'پکیج:'
@@ -62,7 +62,17 @@ const DiscountPage: FC = () => {
             icon={'/discountPriceassets/images/dashboard/icon-avg-cost.svg'}
           />
         </Grid>
-        <Grid xs={12} md={4} item>
+        <Grid xs={12} md={3} item>
+          <StatsCard
+            heading={
+              'تخفیف:'
+            }
+            bgColor="#e2e7f1"
+            value={clients[0]?.remainDiscountAmount.toLocaleString() ?? '0'}
+            icon={'/discountPriceassets/images/dashboard/icon-avg-cost.svg'}
+          />
+        </Grid>
+        <Grid xs={12} md={3} item>
           <StatsCard
             heading={
               'حداکثر تخفیف مجاز‍:'
@@ -72,7 +82,7 @@ const DiscountPage: FC = () => {
             icon={'/discountPriceassets/images/dashboard/icon-avg-cost.svg'}
           />
         </Grid>
-        <Grid xs={12} md={3} item>
+        <Grid xs={12} md={2} item>
           <StatsCard
             heading={
               'تعداد افراد مجاز بر اساس پکیج:'

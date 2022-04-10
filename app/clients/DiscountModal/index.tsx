@@ -46,7 +46,7 @@ const DiscountModal: FC<DiscountProps> = ({ clientId, setOpenModal, openModal, s
       dispatch(fetchStart())
       await confirmDiscount({ childIds: burnedChildren, price: discountPrice, clientId });
       dispatch(showMessage('تخفیف با موفقیت اعمال شد'))
-      invalidateQuery(getClients)
+      await invalidateQuery(getClients)
       setOpenModal(false)
     } catch (err) {
       dispatch(fetchError(GeneralErrors.UNEXPECTED))

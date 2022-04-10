@@ -50,6 +50,12 @@ const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) 
     }
   },
   {
+    field: 'remainDiscountAmount',
+    headerName: 'مقدار کل تخفیف قابل استفاده',
+    width: 220,
+    renderCell: (params: GridRenderCellParams) => <Typography variant="body1" sx={{ color: 'green' }}>{params.value.toLocaleString()} ریال </Typography>
+  },
+  {
     field: 'tools',
     headerName: 'ابزار',
     filterable: false,
