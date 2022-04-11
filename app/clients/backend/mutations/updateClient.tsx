@@ -12,7 +12,7 @@ const updateLevels = async (input) => {
   if (currentlient && currentlient.parentId !== input.AddClient.parentId) {
     const { id } = await updateParent(input.id);
     await db.clientsMap.deleteMany({ where: { parentId: input.id, childId: input.id } })
-    const updatedClient = await addParent(input.AddClient);
+    await addParent(input.AddClient);
   }
   return input;
 }
@@ -39,7 +39,7 @@ export default resolver.pipe(resolver.zod(UpdateClient), updateLevels, async (in
     include: { introduced: true, parent: true, gifts: true, _count: { select: { introduced: true } } }
   });
 
-  // await addUserLog({ action: `${client.name}و کدملی ${client.nationalCode} ویرایش مشتری با نام` }, ctx);
+  await addUserLog({ action: `${client.name}و کدملی ${client.nationalCode} ویرایش مشتری با نام` }, ctx);
 
   // sendSingle('thanks', client.contact, { token: client.name });
 

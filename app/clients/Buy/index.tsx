@@ -240,7 +240,7 @@ export default BuyPart;
 
 const makeThedataReadyForDiscount = (fathers, selectedModel, priceAmount) => {
   const selectedClients: any[] = [];
-  const clients = fathers.filter(item => selectedModel.find(father => father.id === item.fatherId))
+  const clients = fathers.filter(item => selectedModel.find(father => father === item.parentId));
   clients.forEach(client => {
     const maxPayment = client.parent.packageClients[0].package.maxPayment;
     const level = client.parent.packageClients[0].package.level.find(item => item.levelNumber === client.level);
@@ -250,3 +250,4 @@ const makeThedataReadyForDiscount = (fathers, selectedModel, priceAmount) => {
   });
   return selectedClients;
 }
+

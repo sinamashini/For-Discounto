@@ -1,5 +1,6 @@
 import doTheDiscount from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
+import { sendSingle } from "app/sms/sendSingle";
 import { Ctx, resolver } from "blitz"
 import db, { Clients } from "db";
 import { z } from "zod";
@@ -39,6 +40,8 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
   ctx.session.$authorize();
   const { clientId, price, description, clientIds, priceWithDiscount, parentWithPrice } = params;
 
+  console.log('parentWithPrice', parentWithPrice);
+
   if (clientIds) {
     await doTheDiscount({ clientId, parentIds: clientIds, price }, ctx)
   }
@@ -53,6 +56,8 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
   }
 
   await addUserLog({ action: `ثبت خرید برای مشتری با کد ${clientId}` }, ctx);
+
+  await sendSingle('thanks', '09125430547', { token: 'sina' });
 
   return history
 });
