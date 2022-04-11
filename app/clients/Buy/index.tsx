@@ -6,12 +6,12 @@ import { Fonts } from "shared/constants/AppEnums";
 import { GetClientResult } from "../types";
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { BuyValidate } from "../../buyHistory/validation";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import userBuy from "app/buyHistory/mutations/userBuy";
 import { invalidateQuery, useMutation, useQuery } from "blitz";
 import { useDispatch } from "react-redux";
 import { GeneralErrors } from "shared/constants/ErrorsEnums";
-import { fetchError, showMessage } from "app/redux/actions";
+import { fetchError, fetchStart, fetchSuccess, showMessage } from "app/redux/actions";
 import getClientMap from "app/clientMap/queries/getClientMap";
 import SubSetSlectiveDataGrid, { validatePayment } from "./SubSetSlectiveDataGrid";
 import { GridSelectionModel } from "@mui/x-data-grid";
@@ -26,7 +26,6 @@ const BuyPart: FC<Props> = ({ client }) => {
     where: {
       childId: client.id,
       status: "ACTIVE",
-      level: { lte: client?.packageClients[0]?.package.level.length },
       parent: {
         packageClients: { every: { status: "ACTIVE" } },
       }
@@ -52,8 +51,9 @@ const BuyPart: FC<Props> = ({ client }) => {
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [priceWithDiscount, setPriceWithDiscount] = useState(0);
   const [workedOnce, setWorkedOnce] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const nonRelativeClient = clients.find((item: any) => item.parent.packageClients[0].package.level.filter(item => item.levelNumber === item.level));
+  const nonRelativeClient = clients.find((item: any) => item.parent.packageClients[0].package.level.filter(lev => lev.levelNumber !== item.level).length === 0);
 
   useEffect(() => {
     const peopleIncluded = client?.packageClients[0]?.package?.numberOfPeopleIncluded
@@ -76,9 +76,11 @@ const BuyPart: FC<Props> = ({ client }) => {
   const [buy] = useMutation(userBuy);
   const dispatch = useDispatch();
 
-  const handleBuy = async (data, setSubmitting) => {
+  const handleBuy = async (data, setSubmitting, resetForm) => {
     try {
       setSubmitting(true);
+      setMessage('');
+      dispatch(fetchStart());
       const clientIds = selectionModel;
       const parentWithPrice = makeThedataReadyForDiscount(clients, selectionModel, data.price);
       await buy({
@@ -90,7 +92,10 @@ const BuyPart: FC<Props> = ({ client }) => {
       })
       setSubmitting(false);
       dispatch(showMessage('خرید با موفقیت ثبت شد'))
+      setMessage('خرید با موفقیت ثبت شد');
       invalidateQuery(getClients);
+      dispatch(fetchSuccess());
+      resetForm();
       refetch();
     } catch (err) {
       dispatch(fetchError(GeneralErrors.UNEXPECTED));
@@ -100,139 +105,144 @@ const BuyPart: FC<Props> = ({ client }) => {
   if (isLoading) return <></>;
 
   return (
-    <Formik
-      validateOnChange={true}
-      initialValues={{
-        price: 0,
-        description: ''
-      }}
-      validationSchema={toFormikValidationSchema(BuyValidate)}
-      onSubmit={async (data, { setSubmitting }) => await handleBuy(data, setSubmitting)}
-    >
-      {({ values }) => (
-        <Form noValidate autoComplete="off">
-          <Box
-            sx={{
-              padding: 5,
-              ml: -6,
-              mr: -6,
-            }}
-          >
+    <>
+      <Formik
+        validateOnChange={true}
+        initialValues={{
+          price: 0,
+          description: ''
+        }}
+        validationSchema={toFormikValidationSchema(BuyValidate)}
+        onSubmit={async (data, { setSubmitting, resetForm }) => await handleBuy(data, setSubmitting, resetForm)}
+      >
+        {({ values }) => (
+          <Form noValidate autoComplete="off">
             <Box
               sx={{
-                px: 5,
-                mx: -5,
+                padding: 5,
+                ml: -6,
+                mr: -6,
               }}
             >
-
-              <div>
-                {values.price ? <b>{values.price.toLocaleString()} ریال</b> : null}
-                {values?.price >= 0 ? discountFn(values.price) : null}
-                <AppTextField
-                  sx={{
-                    width: "100%",
-                    mt: 2,
-                    mb: { xs: 4, xl: 3 },
-                  }}
-                  variant="outlined"
-                  label="قیمت"
-                  type="number"
-                  name="price"
-                  InputProps={{
-                    endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
-                  }}
-                />
-              </div>
-              <div>
-                <TextField
-                  sx={{
-                    width: "100%",
-                    mt: 2,
-                    '& input': {
-                      fontSize: '18px',
-                      fontWeight: "bold",
-                    },
-                    '& .Mui-disabled': {
-                      color: 'green',
-                      borderColor: 'green'
-                    },
-                    mb: { xs: 4, xl: 3 },
-                  }}
-                  variant="outlined"
-                  label="قیمت تمام شده با تخفیف"
-                  name="ds"
-                  disabled
-                  inputMode="decimal"
-                  value={priceWithDiscount.toLocaleString()}
-                  InputProps={{
-                    endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
-                  }}
-                />
-              </div>
-            </Box>
-            <Box
-              sx={{
-                mt: 3,
-                mb: { xs: 4, xl: 6 },
-              }}>
               <Box
-                component="h6"
                 sx={{
-                  mb: { xs: 4, xl: 6 },
-                  fontSize: 14,
-                  fontWeight: Fonts.SEMI_BOLD,
+                  px: 5,
+                  mx: -5,
                 }}
               >
-                سرشاخه ها
+
+                <div>
+                  {values.price ? <b>{values.price.toLocaleString()} ریال</b> : null}
+                  {values?.price >= 0 ? discountFn(values.price) : null}
+                  <AppTextField
+                    sx={{
+                      width: "100%",
+                      mt: 2,
+                      mb: { xs: 4, xl: 3 },
+                    }}
+                    variant="outlined"
+                    label="قیمت"
+                    type="number"
+                    name="price"
+                    InputProps={{
+                      endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
+                    }}
+                  />
+                </div>
+                <div>
+                  <TextField
+                    sx={{
+                      width: "100%",
+                      mt: 2,
+                      '& input': {
+                        fontSize: '18px',
+                        fontWeight: "bold",
+                      },
+                      '& .Mui-disabled': {
+                        color: 'green',
+                        borderColor: 'green'
+                      },
+                      mb: { xs: 4, xl: 3 },
+                    }}
+                    variant="outlined"
+                    label="قیمت تمام شده با تخفیف"
+                    name="ds"
+                    disabled
+                    inputMode="decimal"
+                    value={priceWithDiscount.toLocaleString()}
+                    InputProps={{
+                      endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
+                    }}
+                  />
+                </div>
               </Box>
-              <SubSetSlectiveDataGrid
-                maxPayment={client.packageClients[0]?.package?.maxPayment ?? 0}
-                numberOfPeopleIncluded={client.packageClients[0]?.package.numberOfPeopleIncluded ?? 0}
-                clients={clients.filter((item: any) => item.id !== nonRelativeClient?.id)}
-                selectionModel={selectionModel}
-                discountFn={discountFn}
-                price={values.price}
-                setSelectionModel={setSelectionModel}
-              />
-            </Box>
-            <Box>
-              <div>
-                <AppTextField
-                  name="description"
-                  multiline
-                  sx={{
-                    width: "100%",
-                  }}
-                  rows="4"
-                  variant="outlined"
-                  placeholder={"توضیح"}
-                />
-              </div>
-            </Box>
-            <Box
-              sx={{
-                mt: 5,
-                pb: 4,
-                mx: -1,
-                textAlign: "right",
-              }}
-            >
-              <Button
+              <Box
                 sx={{
-                  position: "relative",
-                  minWidth: 100,
+                  mt: 3,
+                  mb: { xs: 4, xl: 6 },
+                }}>
+                <Box
+                  component="h6"
+                  sx={{
+                    mb: { xs: 4, xl: 6 },
+                    fontSize: 14,
+                    fontWeight: Fonts.SEMI_BOLD,
+                  }}
+                >
+                  سرشاخه ها
+                </Box>
+                {clients !== undefined ?
+                  <SubSetSlectiveDataGrid
+                    maxPayment={client.packageClients[0]?.package?.maxPayment ?? 0}
+                    numberOfPeopleIncluded={client.packageClients[0]?.package.numberOfPeopleIncluded ?? 0}
+                    clients={clients.filter(item => item.id !== nonRelativeClient?.id)}
+                    selectionModel={selectionModel}
+                    discountFn={discountFn}
+                    price={values.price}
+                    setSelectionModel={setSelectionModel}
+                  />
+                  : null}
+              </Box>
+              <Box>
+                <div>
+                  <AppTextField
+                    name="description"
+                    multiline
+                    sx={{
+                      width: "100%",
+                    }}
+                    rows="4"
+                    variant="outlined"
+                    placeholder={"توضیح"}
+                  />
+                </div>
+              </Box>
+              <Box
+                sx={{
+                  mt: 5,
+                  pb: 4,
+                  mx: -1,
+                  textAlign: "right",
                 }}
-                color="primary"
-                variant="outlined"
-                type="submit"
               >
-                تایید
-              </Button>
+                <Button
+                  sx={{
+                    position: "relative",
+                    minWidth: 100,
+                  }}
+                  color="primary"
+                  variant="outlined"
+                  type="submit"
+                >
+                  تایید
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        </Form>
-      )}
-    </Formik>
+          </Form>
+        )}
+      </Formik>
+      <Typography sx={{ fontSize: 14, fontWeight: "bold", color: 'green' }}>{message}</Typography>
+    </>
   );
 }
 
