@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import ContactTools from "./ContactTools";
 interface ColsInput {
-  handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => void;
+  handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => Promise<void>;
   handleDelete: (id: number) => void
 }
 

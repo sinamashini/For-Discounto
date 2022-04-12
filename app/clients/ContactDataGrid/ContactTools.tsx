@@ -21,7 +21,7 @@ import BuyHistory from '../Buy/BuyHistory';
 interface Props {
   client: GetClientResult[0];
   onDelete: (id: number) => void;
-  onUpdate: (opration: 'add' | 'update', data: any) => void;
+  onUpdate: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 
 const calculatePrices = async (clientId: number, packageId: number) => {

@@ -21,7 +21,7 @@ const folderList = [
 ]
 
 interface Props {
-  onUpdateContact: (opration: 'add' | 'update', data: any) => void;
+  onUpdateContact: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 
 const SideBarContent: FC<Props> = ({ onUpdateContact }) => {

@@ -6,13 +6,13 @@ import { ContactObj } from '../types';
 import { AddClient } from 'app/clients/backend/validation';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { GeneralErrors } from 'shared/constants/ErrorsEnums';
-import { fetchError, fetchStart } from 'app/redux/actions';
+import { fetchError, fetchStart, showMessage } from 'app/redux/actions';
 import { useDispatch } from 'react-redux';
 interface CreateContactProps {
   isAddContact: boolean;
   handleAddContactClose: () => void;
   selectContact?: ContactObj | null;
-  onUpdateContact?: (opration: 'add' | 'update', data: any) => void;
+  onUpdateContact?: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 
 const CreateContact: FC<CreateContactProps> = ({
@@ -52,11 +52,13 @@ const CreateContact: FC<CreateContactProps> = ({
             const opration = selectContact !== undefined ? 'update' : 'add';
             if (onUpdateContact) {
               if (opration === 'add') {
-                onUpdateContact(opration, data);
+                await onUpdateContact(opration, data);
+                dispatch(showMessage("مراجع با موفقیت ثبت شد"))
                 resetForm();
               } else {
                 if (selectContact?.id) {
-                  onUpdateContact(opration, { id: selectContact?.id, addClient: data });
+                  await onUpdateContact(opration, { id: selectContact?.id, addClient: data });
+                  dispatch(showMessage("مراجع با موفقیت ویرایش شد"))
                 }
               }
             }
