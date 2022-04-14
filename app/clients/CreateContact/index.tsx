@@ -23,7 +23,6 @@ const CreateContact: FC<CreateContactProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-
   return (
     <AppDialog
       maxWidth="md"

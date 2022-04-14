@@ -8,18 +8,31 @@ import { updateParent } from "./deleteClient";
 import { omit } from 'lodash';
 
 const updateLevels = async (input) => {
-  const currentlient = await db.clients.findFirst({ where: { id: input.id } });
-  if (currentlient && currentlient.parentId !== input.AddClient.parentId) {
+  const currentClient = await db.clients.findUnique({ where: { id: input.id } });
+  if (currentClient && currentClient.parentId !== input.AddClient.parentId) {
     const { id } = await updateParent(input.id);
-    await db.clientsMap.deleteMany({ where: { parentId: input.id, childId: input.id } })
+    await db.clientsMap.deleteMany({ where: { OR: [{ parentId: id }, { childId: id }] } })
     await addParent(input.AddClient);
   }
   return input;
 }
 
 // input = { email, name, contact, nationalCode, parentId, notes, address }
-export default resolver.pipe(resolver.zod(UpdateClient), updateLevels, async (input, ctx) => {
-  await ctx.session.$authorize();
+export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), updateLevels, async (input, ctx) => {
+  const currentClient = await db.clients.findUnique({
+    where: { id: input.id },
+    include: {
+      packageClients:
+      {
+        where: {
+          AND:
+            [{ clientId: input.id }, { status: "ACTIVE" }]
+        },
+        take: 1,
+        include: { package: true }
+      }
+    }
+  });
 
   const { packageId } = input.AddClient;
 
@@ -28,6 +41,11 @@ export default resolver.pipe(resolver.zod(UpdateClient), updateLevels, async (in
   const packageClientUpdate = await db.packagesClients.findFirst({ where: { clientId: input.id } });
 
   if (!packageClientUpdate) {
+    await db.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
+  }
+
+  if (currentClient?.packageClients[0]?.packageId !== packageId && packageId) {
+    await db.packagesClients.updateMany({ where: { AND: [{ clientId: input.id }, { status: "ACTIVE" }] }, data: { status: "DEACTIVE" } })
     await db.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
   }
 
