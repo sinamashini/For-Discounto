@@ -1,4 +1,4 @@
-import React, { FC, Suspense } from "react";
+import React, { FC } from "react";
 import { useIntl } from "react-intl";
 import AppsContainer from "@zhava/core/AppsContainer";
 import SideBarContent from "./ContactSideBar";
@@ -70,12 +70,12 @@ const Contact: FC = () => {
   const addClientHandler = async (data: any) => {
     const addedResult = await addContact(data);
     dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
-    refetch()
+    await refetch();
   }
 
   const updateClientHandler = async (data: any) => {
     const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
-    refetch();
+    await refetch();
     dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
   }
 
@@ -84,24 +84,14 @@ const Contact: FC = () => {
     oprationHnadler[opration](data);
   }
 
-  const handleDelete = (id: number) => {
-    setQueryData((data) => {
+  const handleDelete = async (id: number) => {
+    await setQueryData((data) => {
       if (data) {
         return data.filter(item => item.id !== id)
       }
       return [];
     });
   }
-
-
-  // const addClientToCache = (client: typeof clients[0]) => {
-  //   setQueryData(data => {
-  //     if (data) {
-  //       return [...[client], ...data];
-  //     }
-  //     return [client]
-  //   })
-  // }
 
   return (<>
     <AppsContainer

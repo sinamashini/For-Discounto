@@ -32,3 +32,11 @@ export const mapedToSelectedContent = (client: GetClientResult[0]): ContactObj =
   packageId: client?.packageClients[0]?.packageId ?? undefined
 })
 
+export const replaceSpaceWithHalfSpace = (text: string) => {
+  const newstr = text.replace(/\s+/g, "‌");
+  return newstr;
+}
+
+export const extractFirstname = (fullname: string): string => {
+  return fullname.substring(0, fullname.indexOf(' '))
+}

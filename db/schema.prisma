@@ -106,6 +106,7 @@ enum StatusEnum {
   USED
   HALF_USED
   DEACTIVE
+  USED_AND_DEACTIVE
 }
 
 model Gifts {

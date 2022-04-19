@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "StatusEnum" ADD VALUE 'USED_AND_DEACTIVE';

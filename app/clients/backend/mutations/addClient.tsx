@@ -28,8 +28,6 @@ const addClient = async (params, ctx) => {
 
   await db.packagesClients.create({ data: { clientId: addedClient.id, packageId, status: "ACTIVE" } })
 
-  //TODO sms
-
   return addedClient;
 }
 

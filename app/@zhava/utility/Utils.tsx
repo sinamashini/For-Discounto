@@ -143,3 +143,9 @@ export const getUserFromJwtAuth = (user: any) => {
     };
   return user;
 };
+
+export const log = (content: any) => {
+  console.log("******************************************");
+  console.log(content);
+  console.log("******************************************");
+}

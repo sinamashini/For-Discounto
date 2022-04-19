@@ -1,3 +1,4 @@
+import { extractFirstname } from "app/clients/backend/helpers";
 import doTheDiscount from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
 import { sendSingle } from "app/sms/sendSingle";
@@ -40,8 +41,6 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
   ctx.session.$authorize();
   const { clientId, price, description, clientIds, priceWithDiscount, parentWithPrice } = params;
 
-  console.log('parentWithPrice', parentWithPrice);
-
   if (clientIds) {
     await doTheDiscount({ clientId, parentIds: clientIds, price }, ctx)
   }
@@ -57,7 +56,7 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
 
   await addUserLog({ action: `ثبت خرید برای مشتری با کد ${clientId}` }, ctx);
 
-  await sendSingle('thanks', '09125430547', { token: 'sina' });
+  await smsHandler(clientId, parentWithPrice)
 
   return history
 });
@@ -114,4 +113,19 @@ export const updateClientCredit = async (clientId, remain = 0, burned = 0, incre
   if (updatedClient.remainDiscountAmount < 0) {
     await db.clients.update({ where: { id: clientId }, data: { remainDiscountAmount: 0 } })
   }
+}
+
+export const smsHandler = async (clientId, parentWithPrice) => {
+  const parents = await db.clients.findMany({ where: { id: { in: parentWithPrice.map(item => item.id) } } });
+  const client = await db.clients.findUnique({ where: { id: clientId } });
+  if (client && parents?.length) {
+    for (const parent of parents) {
+      await sendSingle("discount", parent.contact, {
+        token: extractFirstname(parent.name),
+        token2: client.name,
+        token3: `${parentWithPrice.find(item => item.id === parent.id).discount} ریال`
+      });
+    }
+  }
+
 }

@@ -29,8 +29,8 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
       where: {
         isActive: true,
         ...(selectContact?.id && {
-          NOT: [{
-            AND: [
+          AND: [{
+            NOT: [
               { id: selectContact?.id },
               ((selectContact?.parentId && selectContact?.parentId !== 0) ? { id: selectContact.parentId } : {}),
             ]

@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material"
+import { Tooltip, Typography } from "@mui/material"
 import { GridRenderCellParams } from "@mui/x-data-grid"
 
 export default [
@@ -15,9 +15,10 @@ export default [
   {
     field: 'status',
     headerName: 'وضعیت',
-    width: 200,
+    width: 400,
     renderCell: (params: GridRenderCellParams) => {
-      return <Typography sx={{ color: (params.value === "ACTIVE") ? 'green' : "red" }}>{(params.value === "ACTIVE") ? "فعال" : "غیر فعال"}</Typography>
+      const statusToShow = { ACTIVE: "فعال", DEACTIVE: "غیر فعال", "USED_AND_DEACTIVE": "استفاده شده و در حال حاضر مراجع غیر فعال شده یا زیر مجموعه شخص دیگری است", USED: "استفاده شده" }[params.value] ?? 'نا مشخص'
+      return <Tooltip title={statusToShow}><Typography sx={{ color: (params.value === "ACTIVE") ? 'green' : "red", fontSize: '11px' }}>{statusToShow}</Typography></Tooltip>
     }
   }
 ]

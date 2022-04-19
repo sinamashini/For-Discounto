@@ -1,9 +1,12 @@
 import { Typography } from "@mui/material";
 import { GridRenderCellParams } from "@mui/x-data-grid";
+import getClientMap from "app/clientMap/queries/getClientMap";
+import { useQuery } from "blitz";
+import { FC } from "react";
 import ContactTools from "./ContactTools";
 interface ColsInput {
   handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => Promise<void>;
-  handleDelete: (id: number) => void
+  handleDelete: (id: number) => Promise<void>
 }
 
 const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) => [
@@ -33,11 +36,7 @@ const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) 
     field: 'parent',
     headerName: 'معرف',
     width: 120,
-    renderCell: (params: GridRenderCellParams) => {
-      const parentName = params.row?.parent?.name;
-      if (parentName) return <>{parentName}</>;
-      return <Typography variant="body1" sx={{ color: 'orange' }}>ندارد</Typography>
-    }
+    renderCell: (params: GridRenderCellParams) => <Father clientId={params.row.id} />
   },
   {
     field: 'packageClients',
@@ -70,3 +69,19 @@ const contactsColumns = ({ handleAddOrUpdateContact, handleDelete }: ColsInput) 
 ]
 
 export default contactsColumns;
+
+interface FatherPropsRow {
+  clientId: number;
+}
+
+const Father: FC<FatherPropsRow> = ({ clientId }) => {
+  const [client, { isLoading }] = useQuery(getClientMap,
+    {
+      where: { AND: [{ childId: clientId }, { level: 1 }, { status: { notIn: ["DEACTIVE", "USED_AND_DEACTIVE"] } }] },
+      include: { parent: { select: { name: true } } }
+    });
+  if (isLoading) return <></>;
+  if (!client.length) return <Typography variant="body1" sx={{ color: 'orange' }}>ندارد</Typography>
+  const clientToShow: any = client;
+  return <Typography variant="body1" sx={{ color: 'green' }}>{clientToShow[0]?.parent?.name}</Typography>
+}

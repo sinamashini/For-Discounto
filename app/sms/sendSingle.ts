@@ -1,23 +1,24 @@
+import { replaceSpaceWithHalfSpace } from 'app/clients/backend/helpers';
 import { KavenegarApi } from 'kavenegar';
 
 export const sendSingle = async (template, receptor, params) => {
   const tokens = {
-    token: params.token,
-    ...(params.token2 && { token2: params.token2 }),
-    ...(params.token3 && { token3: params.token3 })
+    "token": replaceSpaceWithHalfSpace(params.token),
+    ...(params.token2 && { "token2": replaceSpaceWithHalfSpace(params.token2) }),
+    ...(params.token3 && { "token3": replaceSpaceWithHalfSpace(params.token3) })
   };
-  console.log(tokens);
   const SMSApi = KavenegarApi({
-    apikey: '314E323138565363514433784A2F5951355A544F5357382B71316247335758662B414C475056474A5365633D',
+    apikey: '74335069726877556F345035764231536F4C4B7133332B467250537A674E427A2F5231384156456E6743733D',
   });
-  console.log(SMSApi);
   await SMSApi.VerifyLookup({
     receptor,
     template,
     ...tokens,
   }, (input, status, message) => {
+    console.log("*****************************")
     console.log(input);
     console.log(status);
     console.log(message);
+    console.log("*****************************")
   });
 }

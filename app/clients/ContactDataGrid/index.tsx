@@ -10,7 +10,7 @@ import { useRouter } from 'blitz';
 
 interface Props {
   clients: GetClientResult;
-  deleteHandle: (id: number) => void;
+  deleteHandle: (id: number) => Promise<void>;
   handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 

@@ -13,7 +13,7 @@ interface Props {
 }
 
 const SubsetModal: FC<Props> = ({ openModal, setOpenModal, clientId }) => {
-  const [clients, { isLoading }] = useQuery(getClientMap, { where: { parentId: clientId }, include: { child: true, } });
+  const [clients, { isLoading }] = useQuery(getClientMap, { where: { parentId: clientId, status: { not: "DEACTIVE" } }, include: { child: true, } });
 
   if (isLoading) return <></>;
 

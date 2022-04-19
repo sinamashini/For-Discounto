@@ -17,7 +17,7 @@ export const AddClient = z.object({
   packageId: z.number(),
   notes: z.string().optional(),
   address: z.string().optional(),
-  parentId: z.number().nullable(),
+  parentId: z.number().nullable().optional(),
   email: z.string().email({ message: GeneralErrors.EMAIL_FORMAT }).transform((str) => str?.toLowerCase().trim()).optional()
 });
 

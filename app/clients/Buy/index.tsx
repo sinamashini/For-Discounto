@@ -27,7 +27,7 @@ const BuyPart: FC<Props> = ({ client }) => {
       childId: client.id,
       status: "ACTIVE",
       parent: {
-        packageClients: { every: { status: "ACTIVE" } },
+        packageClients: { some: { status: "ACTIVE" } },
       }
     },
     include: {
