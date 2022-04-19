@@ -10,6 +10,7 @@ export const sendSingle = async (template, receptor, params) => {
   const SMSApi = KavenegarApi({
     apikey: '74335069726877556F345035764231536F4C4B7133332B467250537A674E427A2F5231384156456E6743733D',
   });
+
   await SMSApi.VerifyLookup({
     receptor,
     template,

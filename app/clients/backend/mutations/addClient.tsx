@@ -4,6 +4,8 @@ import { AddClient } from "../validation"
 import { Clients, StatusEnum } from '@prisma/client';
 import addUserLog from "app/logger/mutations/addUserLog";
 import { omit } from 'lodash';
+import { sendSingle } from "app/sms/sendSingle";
+import { extractFirstname } from "../helpers";
 
 const addClient = async (params, ctx) => {
   await ctx.session.$authorize();
@@ -27,6 +29,8 @@ const addClient = async (params, ctx) => {
   });
 
   await db.packagesClients.create({ data: { clientId: addedClient.id, packageId, status: "ACTIVE" } })
+
+  await handleSms({ name, contact });
 
   return addedClient;
 }
@@ -57,3 +61,10 @@ const fillMapParents = async (parents, client) => {
 
 
 export default resolver.pipe(resolver.zod(AddClient), addClient, addToParentHandler)
+
+
+const handleSms = async ({ name, contact }) => {
+  await sendSingle("head", contact, {
+    token: extractFirstname(name),
+  })
+}

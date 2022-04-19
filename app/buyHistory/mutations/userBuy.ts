@@ -118,14 +118,33 @@ export const updateClientCredit = async (clientId, remain = 0, burned = 0, incre
 export const smsHandler = async (clientId, parentWithPrice) => {
   const parents = await db.clients.findMany({ where: { id: { in: parentWithPrice.map(item => item.id) } } });
   const client = await db.clients.findUnique({ where: { id: clientId } });
-  if (client && parents?.length) {
+  if (parents?.length) {
     for (const parent of parents) {
       await sendSingle("discount", parent.contact, {
         token: extractFirstname(parent.name),
-        token2: client.name,
-        token3: `${parentWithPrice.find(item => item.id === parent.id).discount} ریال`
+        token2: `${parentWithPrice.find(item => item.id === parent.id).discount}`,
+        token3: client?.name,
       });
     }
   }
 
+}
+
+export const maxPaymentRecived = async (parents: number[]) => {
+  // const parentPackage = await db.packagesClients.findMany({
+  //   where: {
+  //     AND: [{
+  //       clientId: { in: parentWithPrice.map(item => item.id) }
+  //     },
+  //     {
+  //       status: "ACTIVE"
+  //     }
+  //     ]
+  //   },
+  //   include: { package: true }
+  // })
+
+  // const clientsPackageDuration = parentPackage.map(item => ({ parentId: item.clientId, duration: item.package.deadLineAfterMaxPayment }));
+
+  const history = await db.discountHistory.findMany({})
 }
