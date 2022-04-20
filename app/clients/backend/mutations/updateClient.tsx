@@ -5,10 +5,10 @@ import { UpdateClient } from "../validation"
 import { omit } from 'lodash';
 import { diffrenceDetctor, updateLevels, updatePackage } from "./update";
 
-export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), diffrenceDetctor, updateLevels, async (input, ctx: Ctx) => {
+export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), diffrenceDetctor, updateLevels, updatePackage, async (input, ctx: Ctx) => {
   const clientToUpdate = omit(input.diffrences, 'packageId');
-  if (clientToUpdate) {
 
+  if (clientToUpdate) {
     const client = await db.clients.update({
       where: { id: input.id },
       data: clientToUpdate,
