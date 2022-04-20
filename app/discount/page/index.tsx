@@ -1,4 +1,4 @@
-import { useQuery, useRouter } from 'blitz';
+import { Head, useQuery, useRouter } from 'blitz';
 import { FC } from 'react';
 import AppsContainer from "@zhava/core/AppsContainer";
 import getClients from 'app/clients/backend/queries/getClients';
@@ -11,6 +11,7 @@ import BuyPart from 'app/clients/Buy';
 import StatsCard from '@zhava/core/Stats/StatsCard';
 import AppsContent from '@zhava/core/AppsContainer/AppsContent';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { makeHeader } from '@zhava/utility/helper/Utils';
 
 const DiscountPage: FC = () => {
   const router = useRouter();
@@ -37,11 +38,14 @@ const DiscountPage: FC = () => {
   if (error) {
     dispatch(fetchError(GeneralErrors.UNEXPECTED));
   }
-
+  const clientName = clients[0]?.name ?? '';
   return <AppsContainer
-    title={'عملیات خرید'}
+    title={`  عملیات خرید برای ${clientName} `}
     fullView={true}
   >
+    <Head>
+      <title> {makeHeader(`خرید  ${clientName}`)}</title>
+    </Head>
     <Box
       sx={{
         height: '100%',
