@@ -62,3 +62,5 @@ export const IntlGlobalProvider = ({
 export const appIntl = () => {
   return intl;
 };
+
+export const makeHeader = (header, defaultHeader = "ژاوا") => `${defaultHeader} | ${header}`

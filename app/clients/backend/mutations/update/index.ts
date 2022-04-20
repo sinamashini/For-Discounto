@@ -4,8 +4,8 @@ import { UpdateClient } from "../../validation";
 import { keys } from 'lodash';
 import { updateParent } from "../deleteClient";
 
-export const diffrenceDetctor = async (clientToUpdate: z.infer<typeof UpdateClient>) => {
-  const currentClient = await db.clients.findUnique({
+export const diffrenceDetctor = async (clientToUpdate: z.infer<typeof UpdateClient>, prisma) => {
+  const currentClient = await prisma.clients.findUnique({
     where: { id: clientToUpdate.id }, include: {
       packageClients: {
         where: {
@@ -36,27 +36,27 @@ export const diffrenceDetctor = async (clientToUpdate: z.infer<typeof UpdateClie
 
 
 
-export const updateLevels = async (input: Awaited<Promise<ReturnType<typeof diffrenceDetctor>>>) => {
+export const updateLevels = async (input: Awaited<Promise<ReturnType<typeof diffrenceDetctor>>>, prisma) => {
   const { parentId } = input.diffrences;
   const { currentClient } = input;
   if (parentId && currentClient) {
-    await updateChildren(input, currentClient.parentId);
+    await updateChildren(input, prisma, currentClient.parentId);
     if (parentId !== null) {
-      await db.clientsMap.create({ data: { parentId, childId: input.id, level: 1, status: "ACTIVE" } });
+      await prisma.clientsMap.create({ data: { parentId, childId: input.id, level: 1, status: "ACTIVE" } });
     }
     if (currentClient.parentId !== null) {
-      await updateFirstLevelChild(input, currentClient);
+      await updateFirstLevelChild(input, prisma, currentClient);
     }
   }
   return input;
 }
 
-export const updateChildren = async (input: z.infer<typeof UpdateClient>, currentParentId?: number | null) => {
+export const updateChildren = async (input: z.infer<typeof UpdateClient>, prisma, currentParentId?: number | null) => {
   const { parentId } = input.AddClient;
   if (parentId !== null) {
-    const childeren = await db.clientsMap.findMany({ where: { parentId: input.id, status: { notIn: ["DEACTIVE", "USED_AND_DEACTIVE"] } } });
+    const childeren = await prisma.clientsMap.findMany({ where: { parentId: input.id, status: { notIn: ["DEACTIVE", "USED_AND_DEACTIVE"] } } });
 
-    await db.clientsMap.updateMany({
+    await prisma.clientsMap.updateMany({
       where: {
         AND:
           [
@@ -68,7 +68,7 @@ export const updateChildren = async (input: z.infer<typeof UpdateClient>, curren
       data: { status: "USED_AND_DEACTIVE" }
     });
 
-    await db.clientsMap.updateMany({
+    await prisma.clientsMap.updateMany({
       where: {
         AND:
           [
@@ -82,7 +82,7 @@ export const updateChildren = async (input: z.infer<typeof UpdateClient>, curren
 
     const childerenForNewParent = childeren.map(child => ({ level: child.level + 1, parentId, childId: child.childId, status: "ACTIVE" as StatusEnum }))
 
-    const newParents = await db.clientsMap.findMany({ where: { childId: parentId } });
+    const newParents = await prisma.clientsMap.findMany({ where: { childId: parentId } });
 
     const childrenWithParentLevel: any = [];
     childeren.forEach(child => {
@@ -91,14 +91,14 @@ export const updateChildren = async (input: z.infer<typeof UpdateClient>, curren
       })
     });
 
-    await db.clientsMap.createMany({ data: childerenForNewParent });
-    await db.clientsMap.createMany({ data: childrenWithParentLevel });
+    await prisma.clientsMap.createMany({ data: childerenForNewParent });
+    await prisma.clientsMap.createMany({ data: childrenWithParentLevel });
   }
 
 }
 
-const updateFirstLevelChild = async (input, currentClient) => {
-  await db.clientsMap.updateMany({
+const updateFirstLevelChild = async (input, currentClient, prisma) => {
+  await prisma.clientsMap.updateMany({
     where: {
       AND: [
         { parentId: currentClient.parentId },
@@ -109,7 +109,7 @@ const updateFirstLevelChild = async (input, currentClient) => {
     data: { status: "USED_AND_DEACTIVE" }
   });
 
-  await db.clientsMap.updateMany({
+  await prisma.clientsMap.updateMany({
     where: {
       AND: [
         { parentId: currentClient.parentId },
@@ -122,11 +122,11 @@ const updateFirstLevelChild = async (input, currentClient) => {
   });
 }
 
-export const updatePackage = async (input: Awaited<Promise<ReturnType<typeof diffrenceDetctor>>>) => {
+export const updatePackage = async (input: Awaited<Promise<ReturnType<typeof diffrenceDetctor>>>, prisma) => {
   const { packageId } = input.diffrences;
   if (packageId) {
-    await db.packagesClients.updateMany({ where: { status: "ACTIVE", clientId: input.id }, data: { status: "DEACTIVE" } });
-    await db.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
+    await prisma.packagesClients.updateMany({ where: { status: "ACTIVE", clientId: input.id }, data: { status: "DEACTIVE" } });
+    await prisma.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
   }
   return input;
 }
