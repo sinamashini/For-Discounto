@@ -53,13 +53,14 @@ const BuyPart: FC<Props> = ({ client }) => {
   const [workedOnce, setWorkedOnce] = useState(false);
   const [message, setMessage] = useState('');
 
-  const nonRelativeClient = clients.find((item: any) => item.parent.packageClients[0].package.level.filter(lev => lev.levelNumber !== item.level).length === 0);
+  // const nonRelativeClient = clients.find((item: any) => item.parent.packageClients[0].package.level.filter(lev => lev.levelNumber !== item.level).length === 0);
 
   useEffect(() => {
     const peopleIncluded = client?.packageClients[0]?.package?.numberOfPeopleIncluded
     if (!workedOnce && peopleIncluded !== undefined && peopleIncluded > 0) {
       const selctedClients: any[] = [...clients];
-      const selectedClients = selctedClients.filter(item => item.status === 'ACTIVE' && nonRelativeClient?.id !== item.id).slice(0, peopleIncluded).map(item => item.parentId);
+      // const selectedClients = selctedClients.filter(item => item.status === 'ACTIVE' && nonRelativeClient?.id !== item.id).slice(0, peopleIncluded).map(item => item.parentId);
+      const selectedClients = selctedClients.filter(item => item.status === 'ACTIVE').slice(0, peopleIncluded).map(item => item.parentId);
       setWorkedOnce(true);
       setSelectionModel(selectedClients);
     }
@@ -195,7 +196,7 @@ const BuyPart: FC<Props> = ({ client }) => {
                   <SubSetSlectiveDataGrid
                     maxPayment={client.packageClients[0]?.package?.maxPayment ?? 0}
                     numberOfPeopleIncluded={client.packageClients[0]?.package.numberOfPeopleIncluded ?? 0}
-                    clients={clients.filter(item => item.id !== nonRelativeClient?.id)}
+                    clients={clients}
                     selectionModel={selectionModel}
                     discountFn={discountFn}
                     price={values.price}
