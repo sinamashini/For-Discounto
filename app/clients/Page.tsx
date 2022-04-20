@@ -3,8 +3,8 @@ import { useIntl } from "react-intl";
 import AppsContainer from "@zhava/core/AppsContainer";
 import SideBarContent from "./ContactSideBar";
 import ContatctsList from "./ContactDataGrid";
-import { AppInfoView, AppLoader } from "@zhava/index";
-import { useMutation, useQuery, useRouter } from "blitz";
+import { AppInfoView } from "@zhava/index";
+import { Head, useMutation, useQuery, useRouter } from "blitz";
 import getClients, { GetClientsQuery } from "./backend/queries/getClients";
 import addClient from "./backend/mutations/addClient";
 import updateClient from "./backend/mutations/updateClient";
@@ -13,6 +13,7 @@ import { fetchError, fetchStart, fetchSuccess, showMessage } from "app/redux/act
 import { GeneralErrors } from "shared/constants/ErrorsEnums";
 // import getPaginatedClients from "./backend/queries/getPaginatedClients";
 import { mapStatusOfContact, createWhereQuery } from "./backend/helpers";
+import { makeHeader } from "@zhava/utility/helper/Utils";
 
 
 
@@ -49,6 +50,7 @@ const Contact: FC = () => {
       }
     }
   });
+
 
   const [addContact] = useMutation(addClient);
   const [updateContact] = useMutation(updateClient);
@@ -94,6 +96,9 @@ const Contact: FC = () => {
   }
 
   return (<>
+    <Head>
+      <title> {makeHeader('مراجعین')} </title>
+    </Head>
     <AppsContainer
       title={messages["contactApp.contact"]}
       fullView={false}
