@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, Suspense } from "react";
 import { useIntl } from "react-intl";
 import AppsContainer from "@zhava/core/AppsContainer";
 import SideBarContent from "./ContactSideBar";
@@ -14,6 +14,7 @@ import { GeneralErrors } from "shared/constants/ErrorsEnums";
 // import getPaginatedClients from "./backend/queries/getPaginatedClients";
 import { mapStatusOfContact, createWhereQuery } from "./backend/helpers";
 import { makeHeader } from "@zhava/utility/helper/Utils";
+import LazyLoader from "@zhava/core/AppSuspense/LazyLoader";
 
 
 
@@ -99,18 +100,20 @@ const Contact: FC = () => {
     <Head>
       <title> {makeHeader('مراجعین')} </title>
     </Head>
-    <AppsContainer
-      title={messages["contactApp.contact"]}
-      fullView={false}
-      sidebarContent={<SideBarContent onUpdateContact={handleAddOrUpdateContact} />}
-    >
-      <ContatctsList
-        clients={clients}
-        deleteHandle={handleDelete}
-        handleAddOrUpdateContact={handleAddOrUpdateContact}
-      />
-    </AppsContainer>
-    <AppInfoView />
+    <Suspense fallback={<LazyLoader delay={300} />}>
+      <AppsContainer
+        title={messages["contactApp.contact"]}
+        fullView={false}
+        sidebarContent={<SideBarContent onUpdateContact={handleAddOrUpdateContact} />}
+      >
+        <ContatctsList
+          clients={clients}
+          deleteHandle={handleDelete}
+          handleAddOrUpdateContact={handleAddOrUpdateContact}
+        />
+      </AppsContainer>
+      <AppInfoView />
+    </Suspense>
   </>
   );
 };

@@ -22,7 +22,7 @@ interface Props {
 }
 
 const BuyPart: FC<Props> = ({ client }) => {
-  const [clients, { isLoading, refetch }] = useQuery(getClientMap, {
+  const [clients, { isLoading, refetch, isFetching }] = useQuery(getClientMap, {
     where: {
       childId: client.id,
       status: "ACTIVE",
@@ -103,7 +103,7 @@ const BuyPart: FC<Props> = ({ client }) => {
     }
   }
 
-  if (isLoading) return <></>;
+  if (isLoading && isFetching) return <></>;
 
   return (
     <>

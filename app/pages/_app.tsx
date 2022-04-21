@@ -25,6 +25,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import createEmotionCache from 'app/core/components/emotion/createEmotionCache';
 import { Box } from '@mui/material';
+import LazyLoader from '@zhava/core/AppSuspense/LazyLoader';
 
 const GlobalDiv = styled('div')`
   * {
@@ -72,7 +73,7 @@ export default function App(
               <AppStyleProvider>
                 <AppLocaleProvider>
                   <GlobalDiv>
-                    <Suspense fallback={false} >
+                    <Suspense fallback={<LazyLoader delay={300} />}>
                       <Component {...pageProps} />
                     </Suspense>
                   </GlobalDiv>

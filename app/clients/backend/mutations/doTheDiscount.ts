@@ -1,11 +1,10 @@
 import addUserLog from "app/logger/mutations/addUserLog";
 import { resolver, Ctx } from "blitz";
-import db from "db";
 import { z } from "zod";
 import { ConfirmDiscount } from "../validation";
 
 
-const updateMapLevel = async ({ parentIds, clientId, price }: z.infer<typeof ConfirmDiscount>) => {
+export const updateMapLevel = async ({ parentIds, clientId, price }: z.infer<typeof ConfirmDiscount>, db) => {
   await db.clientsMap.updateMany({
     where: {
       AND: [

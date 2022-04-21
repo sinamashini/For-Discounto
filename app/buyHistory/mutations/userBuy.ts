@@ -1,5 +1,5 @@
 import { extractFirstname } from "app/clients/backend/helpers";
-import doTheDiscount from "app/clients/backend/mutations/doTheDiscount";
+import doTheDiscount, { updateMapLevel } from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
 import { sendSingle } from "app/sms/sendSingle";
 import { Ctx, resolver } from "blitz"
@@ -44,7 +44,7 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
       const { clientId, price, description, clientIds, priceWithDiscount, parentWithPrice } = params;
 
       if (clientIds) {
-        await doTheDiscount({ clientId, parentIds: clientIds, price }, ctx)
+        await updateMapLevel({ clientId, parentIds: clientIds, price }, db)
       }
 
       const history = await db.buyHistory.create({ data: { clientId, price, description, priceWithDiscount } });
