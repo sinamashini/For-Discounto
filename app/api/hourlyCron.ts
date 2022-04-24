@@ -1,9 +1,14 @@
+import { sendSingle } from "app/sms/sendSingle"
 import { CronJob } from "quirrel/blitz"
 
 export default CronJob(
-  "api/hourlyCron", // the path of this API route
-  "@hourly", // cron schedule (see https://crontab.guru)
+  "api/hourlyCron",
+  "*/5 * * * *",
   async () => {
-    console.log("A new hour has begun!")
+    await sendSingle("discount", '09125430547', {
+      token: 'سینا',
+      token2: '100000',
+      token3: 'حمیدیغمایی'
+    })
   }
 )
