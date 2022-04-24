@@ -1,5 +1,5 @@
 import { extractFirstname } from "app/clients/backend/helpers";
-import doTheDiscount, { updateMapLevel } from "app/clients/backend/mutations/doTheDiscount";
+import { updateMapLevel } from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
 import { sendSingle } from "app/sms/sendSingle";
 import { Ctx, resolver } from "blitz"
