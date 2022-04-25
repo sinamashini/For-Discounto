@@ -15,7 +15,7 @@ const addClient = async (params, ctx) => {
 
   const { packageId } = input;
 
-  const addInput = omit(input, packageId);
+  const addInput = omit(input, 'packageId');
 
 
   const { name, contact, nationalCode, notes, address, parentId, email } = input;

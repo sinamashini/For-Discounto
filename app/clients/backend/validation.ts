@@ -14,7 +14,7 @@ export const AddClient = z.object({
   name,
   contact,
   nationalCode,
-  packageId: z.number().optional(),
+  packageId: z.number(),
   notes: z.string().optional(),
   address: z.string().optional(),
   parentId: z.number().nullable().optional(),
