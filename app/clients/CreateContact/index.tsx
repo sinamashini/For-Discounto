@@ -35,10 +35,8 @@ const CreateContact: FC<CreateContactProps> = ({
           name: selectContact ? selectContact.name : '',
           email: selectContact ? selectContact.email === '' ? undefined : selectContact.email : undefined,
           contact: selectContact ? selectContact.contact : '',
-          address:
-            selectContact && selectContact.address ? selectContact.address : '',
-          notes:
-            selectContact && selectContact.notes ? selectContact.notes : '',
+          address: selectContact && selectContact.address ? selectContact.address : '',
+          notes: selectContact && selectContact.notes ? selectContact.notes : '',
           nationalCode: selectContact && selectContact.nationalCode ? selectContact.nationalCode : '',
           parentId: selectContact && selectContact.parentId ? selectContact.parentId : null,
           packageId: selectContact && selectContact.packageId ? selectContact.packageId : null,
@@ -56,6 +54,7 @@ const CreateContact: FC<CreateContactProps> = ({
                 resetForm();
               } else {
                 if (selectContact?.id) {
+                  console.log(selectContact)
                   await onUpdateContact(opration, { id: selectContact?.id, addClient: data });
                   dispatch(showMessage("مراجع با موفقیت ویرایش شد"))
                 }

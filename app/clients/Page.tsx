@@ -71,15 +71,23 @@ const Contact: FC = () => {
   }
 
   const addClientHandler = async (data: any) => {
-    const addedResult = await addContact(data);
-    dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
-    await refetch();
+    try {
+      const addedResult = await addContact(data);
+      dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
+      await refetch();
+    } catch (err) {
+      dispatch(fetchError(GeneralErrors.UNEXPECTED))
+    }
   }
 
   const updateClientHandler = async (data: any) => {
-    const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
-    await refetch();
-    dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+    try {
+      const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
+      dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+      await refetch();
+    } catch (err) {
+      dispatch(fetchError(GeneralErrors.UNEXPECTED))
+    }
   }
 
   const handleAddOrUpdateContact = async (opration: 'add' | 'update', data: any) => {

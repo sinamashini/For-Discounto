@@ -10,22 +10,25 @@ export const diffrenceDetctor = async (clientToUpdate: z.infer<typeof UpdateClie
       packageClients: {
         where: {
           status: "ACTIVE",
-          clientId: clientToUpdate.id,
         }
       }
     }
   });
 
-  let proccesedCurrentClient: any = currentClient;
+
+  let proccesedCurrentClient: any = { ...currentClient };
   if (currentClient?.packageClients) {
-    proccesedCurrentClient = { ...currentClient, packageId: currentClient?.packageClients[0]?.packageId }
+    proccesedCurrentClient = {
+      ...currentClient,
+      ...(currentClient?.packageClients[0]?.packageId && { packageId: currentClient?.packageClients[0]?.packageId })
+    }
   }
 
   const keysOfObject = keys(clientToUpdate.AddClient);
   let diffrences: any = {};
   if (proccesedCurrentClient) {
     keysOfObject.forEach(key => {
-      if (clientToUpdate.AddClient[key] !== proccesedCurrentClient[key]) {
+      if (clientToUpdate.AddClient[key] !== proccesedCurrentClient[key] && proccesedCurrentClient[key] !== undefined) {
         diffrences = { ...diffrences, [key]: clientToUpdate.AddClient[key] }
       }
     });
@@ -126,7 +129,13 @@ export const updatePackage = async (input: Awaited<Promise<ReturnType<typeof dif
   const { packageId } = input.diffrences;
   if (packageId) {
     await prisma.packagesClients.updateMany({ where: { status: "ACTIVE", clientId: input.id }, data: { status: "DEACTIVE" } });
-    await prisma.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
+    const packageClientExist = await prisma.packagesClients.findMany({ where: { clientId: input.id, packageId } })
+    if (packageClientExist.length > 0) {
+      await prisma.packagesClients.updateMany({ where: { clientId: input.id, packageId }, data: { status: "ACTIVE" } });
+    }
+    else {
+      await prisma.packagesClients.create({ data: { clientId: input.id, packageId, status: "ACTIVE" } });
+    }
   }
   return input;
 }

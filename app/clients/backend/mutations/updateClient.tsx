@@ -4,10 +4,11 @@ import db from "db"
 import { UpdateClient } from "../validation"
 import { omit } from 'lodash';
 import { diffrenceDetctor, updateLevels, updatePackage } from "./update";
+import { log } from "@zhava/utility/Utils";
 
-export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), updatePackage, async (input, ctx: Ctx) => {
+export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), async (input, ctx: Ctx) => {
   try {
-    await db.$transaction(async (db) => {
+    return await db.$transaction(async (db) => {
       const diff = await diffrenceDetctor(input, db);
       const updatedLevel = await updateLevels(diff, db);
       const newInput = await updatePackage(updatedLevel, db);
@@ -18,12 +19,13 @@ export default resolver.pipe(resolver.zod(UpdateClient), resolver.authorize(), u
           data: clientToUpdate,
           include: { introduced: true, parent: true, packageClients: true, gifts: true, _count: { select: { introduced: true } } }
         });
-
-        await addUserLog({ action: `${client.name}و کدملی ${client.nationalCode} ویرایش مشتری با نام` }, ctx);
+        await addUserLog({ action: `${client.name}و کدملی ${client.nationalCode} ویرایش مشتری با نام`, prisma: db }, ctx);
         return client
       }
     })
+
   } catch (err) {
+    log(err)
     return err.message
   }
 })
