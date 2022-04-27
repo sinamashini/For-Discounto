@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 
 export const BuyValidate = z.object({
-  price: z.number(numberErrorObject),
+  price: z.number(numberErrorObject).min(1, 'قیمت باید از ۰ بیشتر باشد'),
   description: z.string().optional(),
 });
 

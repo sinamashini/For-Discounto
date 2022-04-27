@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import { TextFieldProps } from "@mui/material/TextField/TextField";
 
 const AppTextField = (props: TextFieldProps & FieldHookConfig<string>) => {
-  const [field, meta] = useField(props);
+  const [field, meta, helper] = useField(props);
   const errorText = meta.error && meta.touched ? meta.error : "";
   return (
     <TextField

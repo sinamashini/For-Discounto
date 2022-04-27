@@ -55,6 +55,7 @@
     "jalali-moment": "3.3.11",
     "kavenegar": "1.1.4",
     "moment": "2.29.1",
+    "persianjs": "0.4.0",
     "prism-react-renderer": "1.2.1",
     "prop-types": "15.8.1",
     "quirrel": "1.x",

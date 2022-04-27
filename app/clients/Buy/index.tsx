@@ -1,12 +1,12 @@
 import { Box } from "@mui/system";
 import AppTextField from "@zhava/core/AppFormComponents/AppTextField";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikErrors } from "formik";
 import { FC, useEffect, useState } from "react";
 import { Fonts } from "shared/constants/AppEnums";
 import { GetClientResult } from "../types";
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { BuyValidate } from "../../buyHistory/validation";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import userBuy from "app/buyHistory/mutations/userBuy";
 import { invalidateQuery, useMutation, useQuery } from "blitz";
 import { useDispatch } from "react-redux";
@@ -77,27 +77,32 @@ const BuyPart: FC<Props> = ({ client }) => {
   const [buy] = useMutation(userBuy);
   const dispatch = useDispatch();
 
-  const handleBuy = async (data, setSubmitting, resetForm) => {
+  const handleBuy = async (data, setSubmitting, resetForm,
+    setErrors: (errors: FormikErrors<any>) => void) => {
     try {
       setSubmitting(true);
       setMessage('');
       dispatch(fetchStart());
       const clientIds = selectionModel;
-      const parentWithPrice = makeThedataReadyForDiscount(clients, selectionModel, data.price);
-      await buy({
-        ...data,
-        clientId: client.id,
-        priceWithDiscount,
-        ...(clientIds && { clientIds: [...clientIds] }),
-        ...(parentWithPrice && { parentWithPrice: [...parentWithPrice] })
-      })
-      setSubmitting(false);
-      dispatch(showMessage('خرید با موفقیت ثبت شد'))
-      setMessage('خرید با موفقیت ثبت شد');
-      invalidateQuery(getClients);
-      dispatch(fetchSuccess());
-      resetForm();
-      refetch();
+      if (data.price <= 0) {
+        setErrors({ price: "پرداختی باید از ۰ بیشتر باشد" })
+      } else {
+        const parentWithPrice = makeThedataReadyForDiscount(clients, selectionModel, data.price);
+        await buy({
+          ...data,
+          clientId: client.id,
+          priceWithDiscount,
+          ...(clientIds && { clientIds: [...clientIds] }),
+          ...(parentWithPrice && { parentWithPrice: [...parentWithPrice] })
+        })
+        setSubmitting(false);
+        dispatch(showMessage('خرید با موفقیت ثبت شد'))
+        setMessage('خرید با موفقیت ثبت شد');
+        invalidateQuery(getClients);
+        dispatch(fetchSuccess());
+        resetForm();
+        refetch();
+      }
     } catch (err) {
       dispatch(fetchError(GeneralErrors.UNEXPECTED));
     }
@@ -114,7 +119,7 @@ const BuyPart: FC<Props> = ({ client }) => {
           description: ''
         }}
         validationSchema={toFormikValidationSchema(BuyValidate)}
-        onSubmit={async (data, { setSubmitting, resetForm }) => await handleBuy(data, setSubmitting, resetForm)}
+        onSubmit={async (data, { setSubmitting, resetForm, setErrors }) => await handleBuy(data, setSubmitting, resetForm, setErrors)}
       >
         {({ values }) => (
           <Form noValidate autoComplete="off">
@@ -131,7 +136,6 @@ const BuyPart: FC<Props> = ({ client }) => {
                   mx: -5,
                 }}
               >
-
                 <div>
                   {values.price ? <b>{values.price.toLocaleString()} ریال</b> : null}
                   {values?.price >= 0 ? discountFn(values.price) : null}
@@ -177,6 +181,7 @@ const BuyPart: FC<Props> = ({ client }) => {
                   />
                 </div>
               </Box>
+
               <Box
                 sx={{
                   mt: 3,

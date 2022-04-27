@@ -1,7 +1,7 @@
 import React, { CSSProperties, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppInfoView from "@zhava/core/AppInfoView";
-import { Box, Slide, Theme, Zoom } from "@mui/material";
+import { Box, Grid, Slide, Theme, Zoom } from "@mui/material";
 import Hidden from "@mui/material/Hidden";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -17,7 +17,7 @@ import { AppState } from "../../../redux/store";
 
 interface AppsContainerProps {
   title: string | ReactNode;
-
+  actionButtons?: ReactNode | ReactNode[];
   sidebarContent?: ReactNode;
   fullView?: boolean;
   children: ReactNode;
@@ -32,7 +32,7 @@ const AppsContainer: React.FC<AppsContainerProps> = (props) => {
   ).isAppDrawerOpen;
   const { footer } = useLayoutContext();
   const { navStyle } = useLayoutContext();
-  const { title, sidebarContent, fullView, children } = props;
+  const { title, sidebarContent, fullView, children, actionButtons } = props;
 
   return (
     <Box
@@ -82,18 +82,21 @@ const AppsContainer: React.FC<AppsContainerProps> = (props) => {
             </IconButton>
           </Hidden>
         )}
-        <Zoom in style={{ transitionDelay: "300ms" }}>
-          <Box
-            component="h2"
-            sx={{
-              fontSize: 16,
-              color: "text.primary",
-              fontWeight: Fonts.SEMI_BOLD,
-            }}
-          >
-            {title}
-          </Box>
-        </Zoom>
+        <Grid container justifyContent="space-between" alignItems="center" >
+          <Zoom in style={{ transitionDelay: "300ms" }}>
+            <Box
+              component="h2"
+              sx={{
+                fontSize: 16,
+                color: "text.primary",
+                fontWeight: Fonts.SEMI_BOLD,
+              }}
+            >
+              {title}
+            </Box>
+          </Zoom>
+          {actionButtons}
+        </Grid>
       </Box>
 
       <AppContainerWrapper navStyle={navStyle as NavStyle} footer={footer}>

@@ -38,9 +38,28 @@ const DiscountPage: FC = () => {
   if (error) {
     dispatch(fetchError(GeneralErrors.UNEXPECTED));
   }
+
+  const prevBtn = <Zoom in style={{ transitionDelay: "300ms" }}>
+    <Button
+      variant="outlined"
+      color="primary"
+      sx={{
+        mx: 5,
+        width: '5%',
+        borderRadius: 8,
+        "& .MuiSvgIcon-root": {
+          fontSize: 26,
+        },
+      }}
+      startIcon={<ArrowForwardIcon sx={{ ml: 2 }} />}
+      onClick={() => router.push('/clients/all')}
+    />
+  </Zoom>
+
   const clientName = clients[0]?.name ?? '';
   return <AppsContainer
     title={`  عملیات خرید برای ${clientName} `}
+    actionButtons={prevBtn}
     fullView={true}
   >
     <Head>
@@ -89,7 +108,7 @@ const DiscountPage: FC = () => {
         <Grid xs={12} md={2} item>
           <StatsCard
             heading={
-              'تعداد افراد مجاز بر اساس پکیج:'
+              'تعداد افراد مجاز:'
             }
             bgColor="#e2e7f1"
             value={clients[0]?.packageClients[0]?.package.numberOfPeopleIncluded.toString() ?? '0'}
@@ -100,27 +119,9 @@ const DiscountPage: FC = () => {
       <AppLoaderHandler isLoading={isLoading}>
         <AppsContent sx={{
           px: 5,
-          py: 2,
+          py: 5,
         }}>
-          <Zoom in style={{ transitionDelay: "300ms" }}>
-            <Button
-              variant="outlined"
-              color="primary"
-              sx={{
-                mt: 2,
-                float: 'left',
-                padding: "8px 28px",
-                borderRadius: 8,
-                "& .MuiSvgIcon-root": {
-                  fontSize: 26,
-                },
-              }}
-              startIcon={<ArrowForwardIcon sx={{ ml: 2 }} />}
-              onClick={() => router.push('/clients/all')}
-            >
-              بازگشت
-            </Button>
-          </Zoom>
+
           {clients[0] ?
             <BuyPart
               client={clients[0]}
@@ -132,3 +133,4 @@ const DiscountPage: FC = () => {
 }
 
 export default DiscountPage;
+
