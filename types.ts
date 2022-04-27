@@ -1,5 +1,5 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
-import { User } from "db"
+import { User, Prisma, PrismaClient } from "db"
 
 // Note: You should switch to Postgres and then use a DB enum for role type
 export type Role = "ADMIN" | "USER" | "EDITOR";
@@ -16,3 +16,5 @@ declare module "blitz" {
     }
   }
 }
+
+export type DbTransaction = Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectPerOperation | Prisma.RejectOnNotFound | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">;

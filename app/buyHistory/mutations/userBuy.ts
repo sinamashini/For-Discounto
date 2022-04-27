@@ -1,14 +1,17 @@
 import { log } from "@zhava/utility/Utils";
+import dateDiffInDays from "@zhava/utility/dateDiffInDays";
 import { extractFirstname } from "app/clients/backend/helpers";
 import { updateMapLevel } from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
 import { sendSingle } from "app/sms/sendSingle";
 import { Ctx, resolver } from "blitz"
-import db from "db";
+import db, { DiscountHistory } from "db";
+import { DbTransaction } from "types";
 import { z } from "zod";
+import { AddDiscountHistory } from "../types";
 import { AddBuyHiatory, ParentWithPrice } from "../validation"
 
-const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWithPrice>, prisma) => {
+const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWithPrice>, prisma: DbTransaction) => {
   if (parentWithPrice?.length) {
     for (const parent of parentWithPrice) {
       const history = await prisma.discountHistory.findMany({ where: { clientId: parent.id }, orderBy: { createdAt: 'desc' }, take: 1 });
@@ -24,13 +27,13 @@ const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWith
           const { price, remain } = lastDiscount;
           const priceToAdd = price + parent.discount >= maxPayment ? maxPayment : price + parent.discount;
           const remainPresent = price + parent.discount - maxPayment < 0 ? 0 : price + parent.discount - maxPayment
-          await addToDscountHistory(parent.id, priceToAdd, remainPresent + (remain ?? 0), prisma)
+          // await addToDscountHistory(parent.id, priceToAdd, remainPresent + (remain ?? 0), prisma)
           await updateClientCredit(parent.id, parent.discount, prisma)
         }
         else {
           const priceToPay = parent.discount > maxPayment ? maxPayment : parent.discount;
           const remain = parent.discount > maxPayment ? parent.discount - maxPayment : 0;
-          await addToDscountHistory(parent.id, priceToPay, remain, prisma);
+          // await addToDscountHistory(parent.id, priceToPay, remain, prisma);
           await updateClientCredit(parent.id, parent.discount, prisma);
         }
       }
@@ -68,7 +71,7 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
   }
 });
 
-export const doTheDiscountForSelfClient = async (discount, clientId, priceOfService, prisma) => {
+export const doTheDiscountForSelfClient = async (discount, clientId, priceOfService, prisma: DbTransaction) => {
 
   const client = await prisma.clients.findFirst({
     where: { id: clientId },
@@ -80,20 +83,37 @@ export const doTheDiscountForSelfClient = async (discount, clientId, priceOfServ
   const history = await prisma.discountHistory.findMany({ where: { clientId }, orderBy: { createdAt: 'desc' }, take: 1 });
 
   const lastDiscount = history[0];
-
+  // checking the isReached To Max or not before and creation date
   if (lastDiscount) {
-    const { remain, price } = lastDiscount;
+    const { remain, price, status, endDate } = lastDiscount;
+
+
     const maxPayment = client?.packageClients.find(item => item.package.status === "ACTIVE")?.package.maxPayment ?? 0;
     const priceOfServiceByClent = price - priceOfService < 0 ? 0 : price - priceOfService;
     const fromRemain = price >= maxPayment ? maxPayment : priceOfServiceByClent;
     const lastsInRemain = (remain ?? 0) >= maxPayment ? (remain ?? 0) - maxPayment : 0;
-    await addToDscountHistory(clientId, fromRemain, lastsInRemain, prisma);
+
+
+    await addToDscountHistory({
+      clientId,
+      amount: fromRemain,
+      remain: lastsInRemain,
+      prisma,
+      isReachedToMax: fromRemain === maxPayment,
+      status,
+      endDate
+    });
+
     await updateClientAmount(lastsInRemain, clientId, prisma);
   }
 
 }
 
-export const addToDscountHistory = async (clientId, amount, remain, prisma) => {
+
+
+export const addToDscountHistory = async (params: AddDiscountHistory) => {
+  const { clientId, amount, remain, prisma, isReachedToMax } = params;
+
   await prisma.discountHistory.create({
     data: {
       price: amount,
@@ -103,7 +123,7 @@ export const addToDscountHistory = async (clientId, amount, remain, prisma) => {
   });
 }
 
-export const updateClientAmount = async (creadit, clientId, prisma) => {
+export const updateClientAmount = async (creadit, clientId, prisma: DbTransaction) => {
   await prisma.clients.update({
     where: { id: clientId },
     data: { remainDiscountAmount: creadit }
@@ -158,4 +178,16 @@ export const maxPaymentRecived = async (parents: number[]) => {
   // const clientsPackageDuration = parentPackage.map(item => ({ parentId: item.clientId, duration: item.package.deadLineAfterMaxPayment }));
 
   const history = await db.discountHistory.findMany({})
+}
+
+
+export const balancingHistory = async (history: DiscountHistory, prisma: DbTransaction) => {
+  const { endDate, status } = history;
+  if (status === "REACHED_MAX" && endDate) {
+    const now = new Date();
+    const diffDays = dateDiffInDays(now, endDate);
+    if (diffDays < 0) {
+
+    }
+  }
 }

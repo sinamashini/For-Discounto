@@ -181,5 +181,14 @@ model DiscountHistory {
     clientId Int
     numberOfPeopleIncluded Int? @default(0)
     remain Int? @default(0)
+    status DiscountHistoryStatus @default(ACTIVE)
     createdAt DateTime  @default(now())
+    endDate DateTime?
+}
+
+enum DiscountHistoryStatus {
+  ACTIVE
+  REACHED_MAX
+  USED
+  BURNED
 }
