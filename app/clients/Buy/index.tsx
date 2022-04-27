@@ -146,9 +146,9 @@ const BuyPart: FC<Props> = ({ client }) => {
                       mb: { xs: 4, xl: 3 },
                     }}
                     variant="outlined"
-                    label="قیمت"
-                    type="number"
+                    label="وجه پرداختی"
                     name="price"
+                    type="number"
                     InputProps={{
                       endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
                     }}
