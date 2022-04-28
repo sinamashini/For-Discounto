@@ -1,14 +1,11 @@
-import { sendSingle } from "app/sms/sendSingle"
+import { log } from "@zhava/utility/Utils"
 import { CronJob } from "quirrel/blitz"
 
 export default CronJob(
   "api/hourlyCron",
-  "*/1 * * * *",
+  ["0 */2 * * *", "UTC+03:30"],
   async () => {
-    // await sendSingle("discount", '09125430547', {
-    //   token: 'سینا',
-    //   token2: '100000',
-    //   token3: 'لوکال'
-    // })
+    const now = new Date();
+    log('cron is working!!!!' + ' ' + now);
   }
 )
