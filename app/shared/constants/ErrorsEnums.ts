@@ -3,6 +3,7 @@ export enum GeneralErrors {
   NATIONALCODE_FORMAT = "فرمت کدملی صحیح نیست",
   REQUIRED = "ورود این فیلد اجباری است",
   EMAIL_FORMAT = "فرمت ایمیل صحیح نیست",
+  MOBILE_FORMAT = "فرمت موبایل اشتباه است"
 }
 
 export enum AuthError {

@@ -9,6 +9,7 @@ import { useQuery } from "blitz";
 import { AppLoader } from "@zhava/index";
 import getClients from "app/clients/backend/queries/getClients";
 import DiscountPart from "./Form/DiscountPart";
+import AppTextFieldNumber from "@zhava/core/AppFormComponents/AppTextFieldNumber";
 
 interface AddContactFormProps {
   handleAddContactClose: () => void;
@@ -79,7 +80,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
               name="name"
             />
 
-            <AppTextField
+            <AppTextFieldNumber
               sx={{
                 mb: { xs: 4, xl: 6 },
                 width: "100%",
@@ -89,7 +90,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
               name="contact"
             />
 
-            <AppTextField
+            <AppTextFieldNumber
               sx={{
                 mb: { xs: 4, xl: 6 },
                 width: "100%",

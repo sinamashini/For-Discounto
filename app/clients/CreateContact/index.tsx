@@ -54,7 +54,6 @@ const CreateContact: FC<CreateContactProps> = ({
                 resetForm();
               } else {
                 if (selectContact?.id) {
-                  console.log(selectContact)
                   await onUpdateContact(opration, { id: selectContact?.id, addClient: data });
                   dispatch(showMessage("مراجع با موفقیت ویرایش شد"))
                 }

@@ -17,24 +17,12 @@ import { AppLocaleProvider } from "@zhava/index"
 import { useStore } from "../redux/store"
 import { Provider } from 'react-redux';
 import { Suspense } from "react"
-import '../../public/assets/styles/index.css';
 import '../shared/vendors/index.css';
-import { styled } from '@mui/material/styles';
 import { globalStyles } from "app/core/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import createEmotionCache from 'app/core/components/emotion/createEmotionCache';
-import { Box } from '@mui/material';
 import LazyLoader from '@zhava/core/AppSuspense/LazyLoader';
-
-const GlobalDiv = styled('div')`
-  * {
-    font-family: IRANYekan, 'IRANYekan(FaNum)';
-  }
-  &: {
-    font-family: IRANYekan, 'IRANYekan(FaNum)';
-  }
-`
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -72,11 +60,9 @@ export default function App(
             <AppThemeProvider>
               <AppStyleProvider>
                 <AppLocaleProvider>
-                  <GlobalDiv>
-                    <Suspense fallback={<LazyLoader delay={300} />}>
-                      <Component {...pageProps} />
-                    </Suspense>
-                  </GlobalDiv>
+                  <Suspense fallback={<LazyLoader delay={300} />}>
+                    <Component {...pageProps} />
+                  </Suspense>
                 </AppLocaleProvider>
               </AppStyleProvider>
             </AppThemeProvider>

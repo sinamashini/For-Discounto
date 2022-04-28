@@ -84,7 +84,7 @@ export const defaultTheme: any = {
     },
     divider: "rgba(224, 224, 224, 1)",
     typography: {
-      fontFamily: "IRANYekan",
+      fontFamily: "IRANYekan, 'IRANYekan(FaNum)'",
       fontSize: 14,
       fontWeight: 400,
       h1: {

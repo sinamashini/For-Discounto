@@ -1,9 +1,12 @@
 import { FormValidateError, GeneralErrors } from "shared/constants/ErrorsEnums";
 import { z } from "zod"
+import { phoneNumberValidator } from "@persian-tools/persian-tools";
 
 export const name = z.string({ required_error: GeneralErrors.REQUIRED });
 
-export const contact = z.string({ required_error: GeneralErrors.REQUIRED });
+export const contact = z.string({ required_error: GeneralErrors.REQUIRED }).refine((data) => phoneNumberValidator(data), {
+  message: GeneralErrors.MOBILE_FORMAT
+});
 
 export const nationalCode = z.string({ required_error: GeneralErrors.REQUIRED }).refine((data) => checkNationalCode(data) === true, {
   message: GeneralErrors.NATIONALCODE_FORMAT

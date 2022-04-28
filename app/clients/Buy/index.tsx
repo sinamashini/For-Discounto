@@ -6,7 +6,7 @@ import { Fonts } from "shared/constants/AppEnums";
 import { GetClientResult } from "../types";
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import { BuyValidate } from "../../buyHistory/validation";
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import userBuy from "app/buyHistory/mutations/userBuy";
 import { invalidateQuery, useMutation, useQuery } from "blitz";
 import { useDispatch } from "react-redux";
@@ -16,6 +16,9 @@ import getClientMap from "app/clientMap/queries/getClientMap";
 import SubSetSlectiveDataGrid, { validatePayment } from "./SubSetSlectiveDataGrid";
 import { GridSelectionModel } from "@mui/x-data-grid";
 import getClients from "../backend/queries/getClients";
+import behoroof from "@zhava/utility/beHoroof";
+import AppTextFieldPrice from "@zhava/core/AppFormComponents/AppTextFieldPrice";
+
 
 interface Props {
   client: GetClientResult[0]
@@ -47,6 +50,8 @@ const BuyPart: FC<Props> = ({ client }) => {
       }
     }
   });
+
+
 
   const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const [priceWithDiscount, setPriceWithDiscount] = useState(0);
@@ -137,9 +142,9 @@ const BuyPart: FC<Props> = ({ client }) => {
                 }}
               >
                 <div>
-                  {values.price ? <b>{values.price.toLocaleString()} ریال</b> : null}
+                  {values?.price > 1000 && values?.price < 1000000000000000 ? <Typography fontSize={14}>{behoroof(Math.floor(values.price / 10))} تومان</Typography> : null}
                   {values?.price >= 0 ? discountFn(values.price) : null}
-                  <AppTextField
+                  <AppTextFieldPrice
                     sx={{
                       width: "100%",
                       mt: 2,
@@ -148,8 +153,12 @@ const BuyPart: FC<Props> = ({ client }) => {
                     variant="outlined"
                     label="وجه پرداختی"
                     name="price"
-                    type="number"
                     InputProps={{
+                      sx: {
+                        fontWeight: "bold",
+                        fontSize: 16,
+                      },
+                      autoFocus: true,
                       endAdornment: (<Box sx={{ pl: 2 }}>ریال</Box>)
                     }}
                   />
@@ -180,6 +189,7 @@ const BuyPart: FC<Props> = ({ client }) => {
                     }}
                   />
                 </div>
+                {values?.price > 1000 && values?.price !== priceWithDiscount && values?.price < 1000000000000000 ? <Typography color="green" fontSize={14}>{behoroof(Math.floor(priceWithDiscount / 10))} تومان</Typography> : null}
               </Box>
 
               <Box
@@ -197,7 +207,7 @@ const BuyPart: FC<Props> = ({ client }) => {
                 >
                   سرشاخه ها
                 </Box>
-                {clients !== undefined ?
+                {(clients !== undefined && clients.length > 0 && clients !== null) ?
                   <SubSetSlectiveDataGrid
                     maxPayment={client.packageClients[0]?.package?.maxPayment ?? 0}
                     numberOfPeopleIncluded={client.packageClients[0]?.package.numberOfPeopleIncluded ?? 0}

@@ -5,7 +5,7 @@ export const globalStyles = (
     styles={css`
       html,
       body {
-        font-family: IRANYekan;
+        font-family: IRANYekan, 'IRANYekan(FaNum)';
       }
     `}
   />
