@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from 'db';
+import { DiscountHistoryStatus } from 'db'
 import { DbTransaction } from 'types';
 
 export interface AddDiscountHistory {
@@ -6,7 +6,6 @@ export interface AddDiscountHistory {
   amount: number;
   remain: number;
   prisma: DbTransaction
-  isReachedToMax: boolean;
-  status?: string
+  status?: DiscountHistoryStatus
   endDate?: Date | null
 }

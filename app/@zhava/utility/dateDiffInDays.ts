@@ -7,4 +7,7 @@ const dateDiffInDays = (a: Date, b: Date) => {
   return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 }
 
+export const addNDays = (date: Date, days: number) => new Date(date.setDate(date.getDate() + days));
+
+
 export default dateDiffInDays;
