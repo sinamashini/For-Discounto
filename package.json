@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "predev": "docker-compose up -d",
-    "dev": "concurrently --raw \"blitz dev\" 'quirrel'",
+    "dev": "blitz dev",
+    "dev:worker": "concurrently --raw \"blitz dev\" 'quirrel'",
     "build": "blitz build && next build && quirrel ci",
     "start:production": "blitz start --port 5000 ",
     "start": "blitz start",

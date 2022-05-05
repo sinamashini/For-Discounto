@@ -1,3 +1,4 @@
+import { log } from "@zhava/utility/Utils";
 import { extractFirstname } from "app/clients/backend/helpers";
 import { updateMapLevel } from "app/clients/backend/mutations/doTheDiscount";
 import addUserLog from "app/logger/mutations/addUserLog";
@@ -56,14 +57,14 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
         await doTheDiscountForSelfClient(priceWithDiscount, clientId, price, db);
       }
 
-      await addUserLog({ action: `ثبت خرید برای مشتری با کد ${clientId}` }, ctx);
+      await addUserLog({ action: `ثبت خرید برای مشتری با کد ${clientId}`, prisma: db }, ctx);
 
-      await smsHandler(clientId, parentWithPrice)
+      await smsHandler(clientId, parentWithPrice, db);
 
       return history
     })
   } catch (err) {
-
+    log(err);
   }
 });
 
@@ -73,6 +74,7 @@ export const doTheDiscountForSelfClient = async (discount, clientId, priceOfServ
     where: { id: clientId },
     include: { packageClients: { include: { package: true } } }
   });
+
 
 
   const history = await prisma.discountHistory.findMany({ where: { clientId }, orderBy: { createdAt: 'desc' }, take: 1 });
@@ -121,9 +123,12 @@ export const updateClientCredit = async (clientId, remain = 0, prisma, burned = 
   }
 }
 
-export const smsHandler = async (clientId, parentWithPrice) => {
-  const parents = await db.clients.findMany({ where: { id: { in: parentWithPrice.map(item => item.id) } } });
-  const client = await db.clients.findUnique({ where: { id: clientId } });
+export const smsHandler = async (clientId, parentWithPrice, prisma) => {
+  const prismaDb = prisma ?? db;
+
+  const parents = await prismaDb.clients.findMany({ where: { id: { in: parentWithPrice.map(item => item.id) } } });
+  const client = await prismaDb.clients.findUnique({ where: { id: clientId } });
+
   if (parents?.length) {
     for (const parent of parents) {
       await sendSingle("discount", parent.contact, {
