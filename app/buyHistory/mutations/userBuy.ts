@@ -14,13 +14,19 @@ import { AddBuyHiatory, ParentWithPrice } from "../validation"
 const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWithPrice>, prisma: DbTransaction) => {
   if (parentWithPrice?.length) {
     for (const parent of parentWithPrice) {
-      const history = await prisma.discountHistory.findMany({ where: { clientId: parent.id }, orderBy: { createdAt: 'desc' }, take: 1 });
+      const history = await prisma.discountHistory.findMany({
+        where: {
+          clientId: parent.id
+        }, orderBy: { createdAt: 'desc' }, take: 1
+      });
+
       const lastDiscount = history[0];
       const clientPackage = await prisma.packagesClients.findFirst({
         where: { clientId: parent.id, status: "ACTIVE" }, include: {
           package: true
         }
       });
+
       if (clientPackage) {
         const { maxPayment, deadLineAfterMaxPayment } = clientPackage.package;
 
@@ -36,13 +42,18 @@ const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWith
           remainPresent = price + parent.discount - maxPayment < 0 ? 0 : price + parent.discount - maxPayment;
           remainPresent = remainPresent + (remain ?? 0);
           amount = priceToAdd;
-          endDateToAdd = endDate ?? null;
+          endDateToAdd = status === 'REACHED_MAX' ? endDate : null;
 
           statusToAdd = adjustStatus({
             price: priceToAdd,
             maxPayment,
-            status,
+            status: (status === 'BURNED' || status === 'USED') ? "ACTIVE" : status,
           })
+
+          if (statusToAdd === "REACHED_MAX" && status !== "REACHED_MAX") {
+            endDateToAdd = addNDays(new Date(), deadLineAfterMaxPayment ?? 1)
+            //reach max sms
+          }
         }
         else {
           const priceToPay = parent.discount > maxPayment ? maxPayment : parent.discount;
@@ -75,6 +86,7 @@ const updateClientBuyHistory = async (parentWithPrice: z.infer<typeof ParentWith
 
 export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ctx) => {
   ctx.session.$authorize();
+
   try {
     await db.$transaction(async (db) => {
       const { clientId, price, description, clientIds, priceWithDiscount, parentWithPrice } = params;
@@ -83,7 +95,7 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
         await updateMapLevel({ clientId, parentIds: clientIds, price }, db)
       }
 
-      const history = await db.buyHistory.create({ data: { clientId, price, description, priceWithDiscount } });
+
 
       if (parentWithPrice) {
         await updateClientBuyHistory(parentWithPrice, db);
@@ -94,12 +106,14 @@ export default resolver.pipe(resolver.zod(AddBuyHiatory), async (params, ctx: Ct
 
       await addUserLog({ action: `ثبت خرید برای مشتری با کد ${clientId}`, prisma: db }, ctx);
 
+      const history = await db.buyHistory.create({ data: { clientId, price, description, priceWithDiscount } });
+
       await smsHandler(clientId, parentWithPrice, db);
 
       return history
     })
   } catch (err) {
-    log(err);
+    throw new Error(err.message);
   }
 });
 
@@ -116,29 +130,34 @@ export const doTheDiscountForSelfClient = async (discount, clientId, priceOfServ
 
   const lastDiscount = history[0];
   if (lastDiscount) {
-    const { remain, price, endDate } = lastDiscount;
-    const maxPayment = client?.packageClients.find(item => item.package.status === "ACTIVE")?.package.maxPayment ?? 0;
-    const priceOfServiceByClent = price - priceOfService < 0 ? 0 : price - priceOfService;
-    const fromRemain = price >= maxPayment ? maxPayment : priceOfServiceByClent;
-    const lastsInRemain = (remain ?? 0) >= maxPayment ? (remain ?? 0) - maxPayment : 0;
+    const { remain, endDate } = lastDiscount;
+    const packageOfClient = client?.packageClients.find(item => item.package.status === "ACTIVE")?.package;
+    const maxPayment = packageOfClient?.maxPayment ?? 0;
+    const deadLineAfterMaxPayment = packageOfClient?.deadLineAfterMaxPayment ?? 0;
+    const lastsInRemain = calculateRemain(remain ?? 0, maxPayment);
 
 
     await addToDscountHistory({
       clientId,
-      amount: fromRemain,
-      remain: lastsInRemain,
+      amount: 0,
+      remain: remain ?? 0,
       prisma,
       status: "USED",
       endDate
     });
 
-    await addToDscountHistory({
-      clientId,
-      amount: fromRemain,
-      remain: lastsInRemain,
-      prisma,
-      status: "ACTIVE",
-    });
+    if (lastsInRemain !== 0) {
+      const lastStatus = lastsInRemain === maxPayment ? "REACHED_MAX" : "ACTIVE";
+      const remainToAdd = remain ?? 0;
+      await addToDscountHistory({
+        clientId,
+        amount: remainToAdd > maxPayment ? maxPayment : remainToAdd,
+        remain: lastsInRemain,
+        prisma,
+        status: lastStatus,
+        endDate: lastStatus === 'REACHED_MAX' ? addNDays(new Date(), deadLineAfterMaxPayment ?? 1) : null
+      });
+    }
 
 
     await updateClientAmount(lastsInRemain, clientId, prisma);
@@ -149,13 +168,15 @@ export const doTheDiscountForSelfClient = async (discount, clientId, priceOfServ
 
 
 export const addToDscountHistory = async (params: AddDiscountHistory) => {
-  const { clientId, amount, remain, prisma, } = params;
+  const { clientId, amount, remain, prisma, status, endDate } = params;
 
   await prisma.discountHistory.create({
     data: {
       price: amount,
       remain,
-      clientId
+      clientId,
+      status,
+      endDate
     }
   });
 }
@@ -233,21 +254,28 @@ export const balancingHistory = async (history: DiscountHistory, maxPayment: num
       const newEndDate = newStatus === 'REACHED_MAX' ? addNDays(new Date(), numberOfDays) : null;
 
       await prismaDb.clients.update({ where: { id: clientId }, data: { burnedDiscountAmount: { increment: maxPayment }, remainDiscountAmount: { decrement: maxPayment } } })
-      await prismaDb.discountHistory.createMany({
-        data: [{
+      await prismaDb.discountHistory.create({
+        data: {
           clientId,
           price: 0,
           remain: history.remain!,
           status: "BURNED",
           endDate
-        }, {
-          clientId,
-          price: newPrice,
-          remain: newRemain,
-          status: newStatus,
-          endDate: newEndDate
-        }]
-      })
+        },
+      });
+
+      if (history?.remain !== 0) {
+        await prismaDb.discountHistory.create({
+          data: {
+            clientId,
+            price: newPrice,
+            remain: newRemain,
+            status: newStatus,
+            endDate: newEndDate
+          },
+        })
+      }
+
     }
   }
 }
@@ -263,3 +291,5 @@ export const adjustStatus = (input: AdjustStatus): DiscountHistoryStatus => {
   const statusToAdd = price === maxPayment ? "REACHED_MAX" : status;
   return statusToAdd;
 }
+
+const calculateRemain = (remain: number, maxPayment: number): number => remain >= maxPayment ? remain - maxPayment : 0;

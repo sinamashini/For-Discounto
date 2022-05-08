@@ -1,11 +1,8 @@
 // seed scripts should be write there "seedScript/deleteEveryOne" and used here
-
-import db from "db";
-import { addAdminUser } from "seedScript/addUsers";
-import { deleteAllClients } from "seedScript/deleteAllClients";
-
+import { fillingEmptyDb } from "seedScript/fillingEmptyDb";
 
 const seed = async () => {
+  await fillingEmptyDb()
 }
 
 export default seed

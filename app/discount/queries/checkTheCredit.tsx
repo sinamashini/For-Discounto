@@ -2,7 +2,6 @@ import { Ctx, resolver } from "blitz"
 import db from "db";
 import { balancingHistory } from "../../buyHistory/mutations/userBuy";
 import { orderBy } from 'lodash';
-import { log } from "@zhava/utility/Utils";
 
 interface Params {
   clientId: number;
