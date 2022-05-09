@@ -58,6 +58,7 @@
     "kavenegar": "1.1.4",
     "moment": "2.29.1",
     "persianjs": "0.4.0",
+    "ms": "2.1.3",
     "prism-react-renderer": "1.2.1",
     "prop-types": "15.8.1",
     "quirrel": "1.x",
