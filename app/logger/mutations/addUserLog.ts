@@ -1,12 +1,12 @@
 import { Ctx, resolver } from "blitz";
-import db, { PrismaClient, Prisma } from "db";
+import db from "db";
 import { z } from "zod";
+import { DbTransaction } from 'types';
 
-export type DbTranAction = Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">
 
 interface LoggerI {
   action: string;
-  prisma?: DbTranAction
+  prisma?: DbTransaction
 }
 
 export default resolver.pipe(async ({ action, prisma }: LoggerI, ctx: Ctx) => {

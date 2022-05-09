@@ -9,7 +9,8 @@ export const updateMapLevel = async ({ parentIds, clientId, price }: z.infer<typ
     where: {
       AND: [
         { parentId: { in: parentIds } },
-        { childId: clientId }
+        { childId: clientId },
+        { status: "ACTIVE" }
       ]
     },
     data: { status: "USED" }

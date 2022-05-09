@@ -12,30 +12,36 @@ import StatsCard from '@zhava/core/Stats/StatsCard';
 import AppsContent from '@zhava/core/AppsContainer/AppsContent';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { makeHeader } from '@zhava/utility/helper/Utils';
+import checkTheCredit from '../queries/checkTheCredit';
 
 const DiscountPage: FC = () => {
   const router = useRouter();
   const { clientId = '1' } = router.query;
 
-  const [clients, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
+  const [{ }, { isLoading: checkLoading, error: checkError }] = useQuery(checkTheCredit, { clientId: parseInt(clientId as string) })
+
+  const [clients, { isLoading, error, isFetching }] = useQuery(getClients, {
     where: {
       where: {
         id: parseInt(clientId as string),
       }
     }
-  });
+  }, { enabled: !checkLoading });
+
 
   const dispatch = useDispatch();
 
-  if (isLoading && !isFetching) {
+  const loading = checkLoading || isLoading;
+
+  if (loading && !isFetching) {
     dispatch(fetchStart())
   }
 
-  if (!isLoading) {
+  if (!loading) {
     dispatch(fetchSuccess())
   }
 
-  if (error) {
+  if (error || checkError) {
     dispatch(fetchError(GeneralErrors.UNEXPECTED));
   }
 
@@ -55,6 +61,7 @@ const DiscountPage: FC = () => {
       onClick={() => router.push('/clients/all')}
     />
   </Zoom>
+  if (clients === undefined) return <></>;
 
   const clientName = clients[0]?.name ?? '';
   return <AppsContainer
@@ -116,7 +123,7 @@ const DiscountPage: FC = () => {
           />
         </Grid>
       </Grid>
-      <AppLoaderHandler isLoading={isLoading}>
+      <AppLoaderHandler isLoading={loading}>
         <AppsContent sx={{
           px: 5,
           py: 5,

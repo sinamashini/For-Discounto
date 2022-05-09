@@ -181,5 +181,27 @@ model DiscountHistory {
     clientId Int
     numberOfPeopleIncluded Int? @default(0)
     remain Int? @default(0)
+    status DiscountHistoryStatus @default(ACTIVE)
     createdAt DateTime  @default(now())
+    endDate DateTime?
 }
+
+enum DiscountHistoryStatus {
+  ACTIVE
+  REACHED_MAX
+  USED
+  BURNED
+}
+
+model SmsList {
+  id Int @id @default(autoincrement())
+  jobId String
+  receptor String
+  text String?
+  template String?
+  token1 String?
+  token2 String?
+  token3 String?
+  createdAt DateTime @default(now())
+}
+
