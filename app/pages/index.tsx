@@ -1,6 +1,9 @@
 import React from 'react';
-import AppPage from '@zhava/hoc/DefaultPage/index'
-import asyncComponent from "@zhava/utility/asyncComponent";
 
-const SignIn = asyncComponent(() => import('../modules/auth/Signin/index'));
-export default AppPage(() => <SignIn/>);
+import { BlitzPage } from 'blitz';
+
+const Index: BlitzPage = () => <></>
+export default Index
+
+Index.authenticate = { redirectTo: '/signin' };
+Index.redirectAuthenticatedTo = "/clients/all"
