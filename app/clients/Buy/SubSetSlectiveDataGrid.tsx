@@ -26,24 +26,27 @@ const SubSetSlectiveDataGrid: FC<Props> = ({ clients,
     price,
 }) => {
     if (!clients) return null;
-    const handleChangeSelectionModel = (params: GridSelectionModel) => {
-        if (params.length < numberOfPeopleIncluded + 1) {
-            setSelectionModel(params);
-            discountFn(price);
+    if (Array.isArray(clients)) {
+        const handleChangeSelectionModel = (params: GridSelectionModel) => {
+            if (params.length < numberOfPeopleIncluded + 1) {
+                setSelectionModel(params);
+                discountFn(price);
+            }
         }
-    }
 
-    return <Box sx={{ width: '100%' }}>
-        <DataGrid
-            autoHeight
-            rows={clients.map((client: any, index) => ({ name: client.parent.name, ...client, id: client.parentId, eachPersonPoint: price }))}
-            columns={columns}
-            checkboxSelection
-            isRowSelectable={(params: GridRowParams) => params.row.status === 'ACTIVE'}
-            selectionModel={selectionModel}
-            onSelectionModelChange={(newSelectionModel) => handleChangeSelectionModel(newSelectionModel)}
-        />
-    </Box>
+        return <Box sx={{ width: '100%' }}>
+            <DataGrid
+                autoHeight
+                rows={clients.map((client: any, index) => ({ name: client.parent.name, ...client, id: client.parentId, eachPersonPoint: price }))}
+                columns={columns}
+                checkboxSelection
+                isRowSelectable={(params: GridRowParams) => params.row.status === 'ACTIVE'}
+                selectionModel={selectionModel}
+                onSelectionModelChange={(newSelectionModel) => handleChangeSelectionModel(newSelectionModel)}
+            />
+        </Box>
+    }
+    return null;
 }
 
 

@@ -208,13 +208,16 @@ export const addToDscountHistory = async (params: AddDiscountHistory) => {
 }
 
 export const updateClientAmount = async (creadit, clientId, prisma: DbTransaction) => {
+    console.log('error in 215')
     await prisma.clients.update({
         where: { id: clientId },
         data: { remainDiscountAmount: creadit }
     })
+
 }
 
 export const updateClientCredit = async (clientId, remain = 0, prisma, burned = 0, incremental = true) => {
+    console.log('255');
     const updatedClient = await prisma.clients.update({
         where: { id: clientId }, data: {
             remainDiscountAmount: { ...(incremental ? { increment: remain } : { decrement: remain }) },
@@ -222,9 +225,12 @@ export const updateClientCredit = async (clientId, remain = 0, prisma, burned = 
         }
     });
 
+
     if (updatedClient.remainDiscountAmount < 0) {
+        console.log('229')
         await prisma.clients.update({ where: { id: clientId }, data: { remainDiscountAmount: 0 } })
     }
+
 }
 
 export const smsHandler = async (clientId, parentWithPrice, prisma) => {
@@ -302,12 +308,14 @@ export const adjustStatus = (input: AdjustStatus): DiscountHistoryStatus => {
 const calculateRemain = (remain: number, maxPayment: number): number => remain >= maxPayment ? remain - maxPayment : 0;
 
 const handleMaxSms = async () => {
-    const messagesToSend = await db.smsList.findMany({ where: { template: SmsTemplateEnum.DURATION } });
-    if (messagesToSend.length > 0) {
-        for (const message of messagesToSend) {
-            await sendMaxSmsQueue.enqueue(message, {
-                id: message.id.toString(),
-            })
+    if (process.env.NODE_ENV === 'production') {
+        const messagesToSend = await db.smsList.findMany({ where: { template: SmsTemplateEnum.DURATION } });
+        if (messagesToSend?.length > 0) {
+            for (const message of messagesToSend) {
+                await sendMaxSmsQueue.enqueue(message, {
+                    id: message.id.toString(),
+                })
+            }
         }
     }
 }
