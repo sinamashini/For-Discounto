@@ -19,111 +19,107 @@ import LazyLoader from "@zhava/core/AppSuspense/LazyLoader";
 
 
 const createSearchQueryForClient = (keyword: string): GetClientsQuery => {
-  return {
-    where: {
-      isActive: true,
-      OR: [
-        { nationalCode: { contains: keyword } },
-        { name: { contains: keyword } },
-        { contact: { contains: keyword } },
-      ]
+    return {
+        where: {
+            isActive: true,
+            OR: [
+                { nationalCode: { contains: keyword } },
+                { name: { contains: keyword } },
+                { contact: { contains: keyword } },
+            ]
+        }
     }
-  }
 }
 
 const Contact: FC = () => {
-  const { messages } = useIntl();
-  const { query } = useRouter();
+    const { messages } = useIntl();
+    const { query } = useRouter();
 
-  const { status = "all", keyword = "" } = query;
+    const { status = "all", keyword = "" } = query;
 
-  const mapedStatus = mapStatusOfContact(status as string);
+    const mapedStatus = mapStatusOfContact(status as string);
 
-  const conditions = createWhereQuery(mapedStatus);
+    const conditions = createWhereQuery(mapedStatus);
 
-  const where = createSearchQueryForClient(keyword as string)
+    const where = createSearchQueryForClient(keyword as string)
 
-  const [clients, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
-    where: {
-      where: {
-        ...where.where,
-        ...conditions
-      }
-    }
-  });
-
-
-  const [addContact] = useMutation(addClient);
-  const [updateContact] = useMutation(updateClient);
-
-  const dispatch = useDispatch();
-
-  if (isLoading && !isFetching) {
-    dispatch(fetchStart());
-  }
-
-  if (!isLoading) {
-    dispatch(fetchSuccess())
-  }
-
-  if (error) {
-    dispatch(fetchError(GeneralErrors.UNEXPECTED));
-  }
-
-  const addClientHandler = async (data: any) => {
-    try {
-      const addedResult = await addContact(data);
-      dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
-      await refetch();
-    } catch (err) {
-      dispatch(fetchError(GeneralErrors.UNEXPECTED))
-    }
-  }
-
-  const updateClientHandler = async (data: any) => {
-    try {
-      const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
-      dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
-      await refetch();
-    } catch (err) {
-      dispatch(fetchError(GeneralErrors.UNEXPECTED))
-    }
-  }
-
-  const handleAddOrUpdateContact = async (opration: 'add' | 'update', data: any) => {
-    const oprationHnadler = { add: addClientHandler, update: updateClientHandler };
-    oprationHnadler[opration](data);
-  }
-
-  const handleDelete = async (id: number) => {
-    await setQueryData((data) => {
-      if (data) {
-        return data.filter(item => item.id !== id)
-      }
-      return [];
+    const [{ clients, hasMore, count }, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
+        where: {
+            ...where.where,
+            ...conditions
+        }
     });
-  }
 
-  return (<>
-    <Head>
-      <title> {makeHeader('مراجعین')} </title>
-    </Head>
-    <Suspense fallback={<LazyLoader delay={300} />}>
-      <AppsContainer
-        title={messages["contactApp.contact"]}
-        fullView={false}
-        sidebarContent={<SideBarContent onUpdateContact={handleAddOrUpdateContact} />}
-      >
-        <ContatctsList
-          clients={clients}
-          deleteHandle={handleDelete}
-          handleAddOrUpdateContact={handleAddOrUpdateContact}
-        />
-      </AppsContainer>
-      <AppInfoView />
-    </Suspense>
-  </>
-  );
+
+    const [addContact] = useMutation(addClient);
+    const [updateContact] = useMutation(updateClient);
+
+    const dispatch = useDispatch();
+
+    if (isLoading && !isFetching) {
+        dispatch(fetchStart());
+    }
+
+    if (!isLoading) {
+        dispatch(fetchSuccess())
+    }
+
+    if (error) {
+        dispatch(fetchError(GeneralErrors.UNEXPECTED));
+    }
+
+    const addClientHandler = async (data: any) => {
+        try {
+            const addedResult = await addContact(data);
+            dispatch(showMessage('کاربر جدید با موفقیت اضافه شد'));
+            await refetch();
+        } catch (err) {
+            dispatch(fetchError(GeneralErrors.UNEXPECTED))
+        }
+    }
+
+    const updateClientHandler = async (data: any) => {
+        try {
+            const updatedCotact = await updateContact({ id: data.id, AddClient: data.addClient });
+            dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+            await refetch();
+        } catch (err) {
+            dispatch(fetchError(GeneralErrors.UNEXPECTED))
+        }
+    }
+
+    const handleAddOrUpdateContact = async (opration: 'add' | 'update', data: any) => {
+        const oprationHnadler = { add: addClientHandler, update: updateClientHandler };
+        oprationHnadler[opration](data);
+    }
+
+    const handleDelete = async (id: number) => {
+        await setQueryData((data) => {
+            if (data?.clients) {
+                return data.clients.filter(item => item.id !== id)
+            }
+            return { clients: [], hasMore: false, count: 0 };
+        });
+    }
+
+    return (<>
+        <Head>
+            <title> {makeHeader('مراجعین')} </title>
+        </Head>
+        <AppsContainer
+            title={messages["contactApp.contact"]}
+            fullView={false}
+            sidebarContent={<SideBarContent onUpdateContact={handleAddOrUpdateContact} />}
+        >
+            <ContatctsList
+                clients={clients}
+                deleteHandle={handleDelete}
+                handleAddOrUpdateContact={handleAddOrUpdateContact}
+            />
+        </AppsContainer>
+        {/* <AppInfoView /> */}
+    </>
+    );
 };
 
 export default Contact;

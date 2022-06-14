@@ -5,30 +5,30 @@ import { CircularProgress } from '@mui/material';
 
 
 export interface LazyLoaderProps {
-  delay?: number;
+    delay?: number;
 }
 
 const LazyLoader: FC<LazyLoaderProps> = ({
-  delay = 250,
-  ...props
+    delay = 5,
+    ...props
 }) => {
-  const [show, setShow] = useState(false);
+    const [show, setShow] = useState(false);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShow(true);
-    }, delay);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [delay]);
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setShow(true);
+        }, delay);
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [delay]);
 
-  return show ? <Backdrop
-    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-    open
-  >
-    <CircularProgress color="inherit" />
-  </Backdrop> : null;
+    return show ? <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open
+    >
+        <CircularProgress color="inherit" />
+    </Backdrop> : null;
 };
 
 export { LazyLoader as default };

@@ -4,12 +4,12 @@ import { useLayoutContext } from "@zhava/utility/AppContextProvider/LayoutContex
 import { BlitzPage } from "blitz";
 
 const ClientStatus: BlitzPage = () => {
-  const { navStyle } = useLayoutContext();
-  const AppLayout = Layouts[navStyle];
+    const { navStyle } = useLayoutContext();
+    const AppLayout = Layouts[navStyle];
 
-  return <AppLayout>
-    <Contact />
-  </AppLayout>
+    return <AppLayout>
+        <Contact />
+    </AppLayout>
 }
 
 ClientStatus.authenticate = { redirectTo: '/signin' };

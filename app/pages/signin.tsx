@@ -1,7 +1,16 @@
-import asyncComponent from "@zhava/utility/asyncComponent";
-import { BlitzPage } from "blitz"
+import Signin from "../modules/auth/Signin/index"
+import React from 'react';
+import Layouts from "@zhava/core/AppLayout/Layouts";
+import { useLayoutContext } from "@zhava/utility/AppContextProvider/LayoutContextProvider";
+import { BlitzPage } from 'blitz';
 
-const SignIn: BlitzPage = asyncComponent(() => import('../modules/auth/Signin/index'));
+const SigninPage: BlitzPage = () => {
+    // const { navStyle } = useLayoutContext();
+    // const AppLayout = Layouts[navStyle];
+    return <Signin />
+}
 
-SignIn.redirectAuthenticatedTo = "/"
-export default SignIn;
+SigninPage.redirectAuthenticatedTo = { pathname: 'clients/all' }
+
+export default SigninPage
+
