@@ -102,11 +102,11 @@ const SideBarContent: FC<Props> = ({ onUpdateContact }) => {
                             )}
                         />
                     </List>
-                    {/* <CreateContact
-            isAddContact={isAddContact}
-            onUpdateContact={onUpdateContact}
-            handleAddContactClose={handleAddContactClose}
-          /> */}
+                    <CreateContact
+                        isAddContact={isAddContact}
+                        onUpdateContact={onUpdateContact}
+                        handleAddContactClose={handleAddContactClose}
+                    />
                 </Box>
                 <AppInfoView />
             </AppScrollbar>

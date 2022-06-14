@@ -1,5 +1,4 @@
 import { FC, useEffect, useState } from 'react';
-import AppLoader from '../AppLoader';
 import Backdrop from '@mui/material/Backdrop';
 import { CircularProgress } from '@mui/material';
 
@@ -28,6 +27,7 @@ const LazyLoader: FC<LazyLoaderProps> = ({
         open
     >
         <CircularProgress color="inherit" />
+
     </Backdrop> : null;
 };
 

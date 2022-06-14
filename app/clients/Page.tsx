@@ -11,10 +11,9 @@ import updateClient from "./backend/mutations/updateClient";
 import { useDispatch } from "react-redux";
 import { fetchError, fetchStart, fetchSuccess, showMessage } from "app/redux/actions";
 import { GeneralErrors } from "shared/constants/ErrorsEnums";
-// import getPaginatedClients from "./backend/queries/getPaginatedClients";
 import { mapStatusOfContact, createWhereQuery } from "./backend/helpers";
 import { makeHeader } from "@zhava/utility/helper/Utils";
-import LazyLoader from "@zhava/core/AppSuspense/LazyLoader";
+import AppLoaderTransparent from "@zhava/core/AppLoaderHandler/AppLoaderTransparent";
 
 
 
@@ -43,22 +42,29 @@ const Contact: FC = () => {
 
     const where = createSearchQueryForClient(keyword as string)
 
-    const [{ clients, hasMore, count }, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
+    const [clients, { isLoading, error, setQueryData, refetch, isFetching }] = useQuery(getClients, {
         where: {
-            ...where.where,
-            ...conditions
+            where: {
+                ...where.where,
+                ...conditions
+            }
         }
+    }, { suspense: false });
+
+
+    const [addContact, { isLoading: addClientLoading }] = useMutation(addClient);
+    const [updateContact, { isLoading: updateClientLoading }] = useMutation(updateClient, {
+        onSuccess(data, variables, context) {
+            dispatch(showMessage('اطلاعات کاربر با موفقیت ویرایش شد'));
+
+        },
+        onError() {
+            dispatch(fetchError(GeneralErrors.UNEXPECTED));
+        },
+        useErrorBoundary: true
     });
 
-
-    const [addContact] = useMutation(addClient);
-    const [updateContact] = useMutation(updateClient);
-
     const dispatch = useDispatch();
-
-    if (isLoading && !isFetching) {
-        dispatch(fetchStart());
-    }
 
     if (!isLoading) {
         dispatch(fetchSuccess())
@@ -95,14 +101,15 @@ const Contact: FC = () => {
 
     const handleDelete = async (id: number) => {
         await setQueryData((data) => {
-            if (data?.clients) {
-                return data.clients.filter(item => item.id !== id)
+            if (data) {
+                return data.filter(item => item.id !== id)
             }
-            return { clients: [], hasMore: false, count: 0 };
+            return [];
         });
     }
 
     return (<>
+        <AppLoaderTransparent isLoading={addClientLoading || updateClientLoading} />
         <Head>
             <title> {makeHeader('مراجعین')} </title>
         </Head>
@@ -112,12 +119,13 @@ const Contact: FC = () => {
             sidebarContent={<SideBarContent onUpdateContact={handleAddOrUpdateContact} />}
         >
             <ContatctsList
+                isClientLoading={isLoading}
                 clients={clients}
                 deleteHandle={handleDelete}
                 handleAddOrUpdateContact={handleAddOrUpdateContact}
             />
+            <AppInfoView />
         </AppsContainer>
-        {/* <AppInfoView /> */}
     </>
     );
 };

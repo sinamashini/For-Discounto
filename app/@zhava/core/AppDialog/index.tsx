@@ -11,104 +11,106 @@ import { TransitionProps } from "@mui/material/transitions";
 import { Breakpoint, SxProps } from "@mui/system";
 
 const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
-  // eslint-disable-next-line no-undef
-  ref: React.Ref<unknown>
+    props: TransitionProps & {
+        children: React.ReactElement<any, any>;
+    },
+    // eslint-disable-next-line no-undef
+    ref: React.Ref<unknown>
 ) {
-  return <Slide direction="up" ref={ref} {...props} />;
+    return <Slide direction="up" ref={ref} {...props} />;
 });
 
 interface AppDialogProps {
-  maxWidth?: Breakpoint;
-  open: boolean;
-  onClose: () => void;
-  children: ReactNode;
-  title?: string | ReactNode;
-  dividers?: boolean;
-  hideClose?: boolean;
-  fullHeight?: boolean;
-  actionTitle?: string;
-  sxStyle?: SxProps<Theme>;
+    maxWidth?: Breakpoint;
+    open: boolean;
+    onClose?: () => void;
+    children: ReactNode;
+    title?: string | ReactNode;
+    dividers?: boolean;
+    hideClose?: boolean;
+    fullHeight?: boolean;
+    actionTitle?: string;
+    sxStyle?: SxProps<Theme>;
+    closableFromOutSide?: boolean;
 }
 
 const AppDialog: React.FC<AppDialogProps> = ({
-  sxStyle,
-  maxWidth = "sm",
-  hideClose = false,
-  open,
-  onClose,
-  children,
-  dividers = false,
-  title,
-  actionTitle,
-  fullHeight = false,
+    sxStyle,
+    maxWidth = "sm",
+    hideClose = false,
+    open,
+    onClose,
+    closableFromOutSide = false,
+    children,
+    dividers = false,
+    title,
+    fullHeight = false,
+    actionTitle,
 }) => {
-  return (
-    <Dialog
-      sx={{
-        "& .MuiDialog-paper": {
-          width: "100%",
-        },
-        "& .MuiDialogContent-root": {
-          overflowY: "hidden",
-          paddingLeft: 0,
-          paddingRight: 0,
-        },
-        ...sxStyle,
-      }}
-      maxWidth={maxWidth}
-      TransitionComponent={Transition}
-      open={open}
-      onClose={onClose}
-    >
-      <DialogTitle
-        sx={{
-          fontSize: 14,
-          fontWeight: Fonts.MEDIUM,
-        }}
-        id="app-dialog-title"
-      >
-        {title}
-        {hideClose ? null : (
-          <IconButton
-            aria-label="close"
+    return (
+        <Dialog
             sx={{
-              position: "absolute",
-              right: 4,
-              top: 4,
-              color: "grey.500",
+                "& .MuiDialog-paper": {
+                    width: "100%",
+                },
+                "& .MuiDialogContent-root": {
+                    overflowY: "hidden",
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                },
+                ...sxStyle,
             }}
-            onClick={onClose}
-            size="large"
-          >
-            <CloseIcon />
-          </IconButton>
-        )}
-      </DialogTitle>
-      <DialogContent dividers={dividers}>
-        <AppScrollbar
-          sx={{
-            paddingTop: 1,
-            height: fullHeight ? "70vh" : "100%",
-            minHeight: "300px",
-            maxHeight: "400px",
-            paddingRight: 6,
-            paddingLeft: 6,
-          }}
+            maxWidth={maxWidth}
+            TransitionComponent={Transition}
+            open={open}
+            {...(closableFromOutSide ? { onClose } : null)}
         >
-          {children}
-        </AppScrollbar>
-      </DialogContent>
-      {actionTitle ? (
-        <DialogActions>
-          <Button color="primary" variant="contained" type="submit">
-            {actionTitle}
-          </Button>
-        </DialogActions>
-      ) : null}
-    </Dialog>
-  );
+            <DialogTitle
+                sx={{
+                    fontSize: 14,
+                    fontWeight: Fonts.MEDIUM,
+                }}
+                id="app-dialog-title"
+            >
+                {title}
+                {hideClose ? null : (
+                    <IconButton
+                        aria-label="close"
+                        sx={{
+                            position: "absolute",
+                            right: 4,
+                            top: 4,
+                            color: "grey.500",
+                        }}
+                        onClick={onClose}
+                        size="large"
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                )}
+            </DialogTitle>
+            <DialogContent dividers={dividers}>
+                <AppScrollbar
+                    sx={{
+                        paddingTop: 1,
+                        height: fullHeight ? "70vh" : "100%",
+                        minHeight: "300px",
+                        maxHeight: "400px",
+                        paddingRight: 6,
+                        paddingLeft: 6,
+                    }}
+                >
+                    {children}
+                </AppScrollbar>
+            </DialogContent>
+            {actionTitle ? (
+                <DialogActions>
+                    <Button color="primary" variant="contained" type="submit">
+                        {actionTitle}
+                    </Button>
+                </DialogActions>
+            ) : null}
+        </Dialog>
+    );
 };
 export default AppDialog;

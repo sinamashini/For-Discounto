@@ -18,96 +18,97 @@ import BuyHistory from '../Buy/BuyHistory';
 import getClients from '../backend/queries/getClients';
 
 interface Props {
-  client: GetClientResult[0];
-  onDelete: (id: number) => Promise<void>;
-  onUpdate: (opration: 'add' | 'update', data: any) => Promise<void>;
+    client: GetClientResult[0];
+    onDelete: (id: number) => Promise<void>;
+    onUpdate: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 
 const ContactTools: FC<Props> = ({ client, onDelete, onUpdate }) => {
-  const [openHistoryModal, setOpenHistoryModal] = useState(false);
-  const [deleteContact, { isLoading }] = useMutation(deleteClient);
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [openSubSetModal, setOpenSubSetModal] = useState(false);
-  const router = useRouter();
+    const [openHistoryModal, setOpenHistoryModal] = useState(false);
+    const [deleteContact, { isLoading }] = useMutation(deleteClient);
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openSubSetModal, setOpenSubSetModal] = useState(false);
+    const router = useRouter();
 
+    const dispatch = useDispatch();
 
-
-  const dispatch = useDispatch();
-
-  const deleteConfirm = async () => {
-    try {
-      if (client.id) {
-        dispatch(fetchStart())
-        await deleteContact({ id: client.id });
-        await invalidateQuery(getClients)
-        dispatch(showMessage('مراجع حذف شد'));
-      }
-    } catch (error) {
-      dispatch(fetchError('خطایی رخ داده لطفا مجددا امتحان کنید!'))
+    const deleteConfirm = async () => {
+        try {
+            if (client.id) {
+                dispatch(fetchStart())
+                await deleteContact({ id: client.id });
+                await invalidateQuery(getClients)
+                dispatch(showMessage('مراجع حذف شد'));
+            }
+        } catch (error) {
+            dispatch(fetchError('خطایی رخ داده لطفا مجددا امتحان کنید!'))
+        }
     }
-  }
 
+    if (isLoading) return <AppLoader />;
 
+    return <><Stack direction="row" alignItems="center" spacing={2}>
+        <Tooltip key="edit" title="ویرایش" arrow>
+            <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => setOpenEditDialog(true)}>
+                <EditIcon />
+            </IconButton>
+        </Tooltip>
+        <Tooltip key="buying" title="خرید" arrow>
+            <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => router.push(`/discount/${client.id}`)}>
+                <AttachMoneyIcon />
+            </IconButton>
+        </Tooltip>
+        <Tooltip key="subs" title="لیست زیر مجموعه ها" arrow>
+            <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenSubSetModal(true)}>
+                <PeopleAltIcon />
+            </IconButton>
+        </Tooltip>
+        <Tooltip key="buyhis" title=" سابقه خرید" arrow>
+            <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenHistoryModal(true)}>
+                <HistoryIcon />
+            </IconButton>
+        </Tooltip>
+        <Tooltip key="delete" title="حذف مراجع" arrow>
+            <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => setDeleteDialogOpen(true)}>
+                <DeleteIcon />
+            </IconButton>
+        </Tooltip>
 
-  if (isLoading) return <AppLoader />;
+    </Stack>
+        {isDeleteDialogOpen &&
+            <AppConfirmDialog
+                open={isDeleteDialogOpen}
+                onDeny={setDeleteDialogOpen}
+                onConfirm={deleteConfirm}
+                title={`کاربر ${client.name}`}
+                dialogTitle="آیا از حذف این کاربر مطمین هستید؟"
+            />
+        }
+        {openEditDialog &&
+            <CreateContact
+                isAddContact={openEditDialog}
+                selectContact={mapedToSelectedContent(client)}
+                onUpdateContact={onUpdate}
+                handleAddContactClose={() => setOpenEditDialog(false)}
+            />
+        }
 
-  return <><Stack direction="row" alignItems="center" spacing={2}>
-    <Tooltip key="edit" title="ویرایش" arrow>
-      <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => setOpenEditDialog(true)}>
-        <EditIcon />
-      </IconButton>
-    </Tooltip>
-    <Tooltip key="buying" title="خرید" arrow>
-      <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => router.push(`/discount/${client.id}`)}>
-        <AttachMoneyIcon />
-      </IconButton>
-    </Tooltip>
-    <Tooltip key="subs" title="لیست زیر مجموعه ها" arrow>
-      <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenSubSetModal(true)}>
-        <PeopleAltIcon />
-      </IconButton>
-    </Tooltip>
-    <Tooltip key="buyhis" title=" سابقه خرید" arrow>
-      <IconButton color="primary" aria-label="" component="span" onClick={() => setOpenHistoryModal(true)}>
-        <HistoryIcon />
-      </IconButton>
-    </Tooltip>
-    <Tooltip key="delete" title="حذف مراجع" arrow>
-      <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => setDeleteDialogOpen(true)}>
-        <DeleteIcon />
-      </IconButton>
-    </Tooltip>
-
-  </Stack>
-    <AppConfirmDialog
-      open={isDeleteDialogOpen}
-      onDeny={setDeleteDialogOpen}
-      onConfirm={deleteConfirm}
-      title={`کاربر ${client.name}`}
-      dialogTitle="آیا از حذف این کاربر مطمین هستید؟"
-    />
-
-    <CreateContact
-      isAddContact={openEditDialog}
-      selectContact={mapedToSelectedContent(client)}
-      onUpdateContact={onUpdate}
-      handleAddContactClose={() => setOpenEditDialog(false)}
-    />
-
-
-    <SubsetModal
-      clientId={client.id}
-      openModal={openSubSetModal}
-      setOpenModal={setOpenSubSetModal}
-    />
-
-    <BuyHistory
-      clientId={client.id}
-      openModal={openHistoryModal}
-      setOpenModal={setOpenHistoryModal}
-    />
-  </>
+        {openSubSetModal &&
+            <SubsetModal
+                clientId={client.id}
+                openModal={openSubSetModal}
+                setOpenModal={setOpenSubSetModal}
+            />
+        }
+        {openHistoryModal &&
+            <BuyHistory
+                clientId={client.id}
+                openModal={openHistoryModal}
+                setOpenModal={setOpenHistoryModal}
+            />
+        }
+    </>
 }
 
 

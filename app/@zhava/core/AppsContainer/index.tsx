@@ -135,7 +135,7 @@ const AppsContainer: React.FC<AppsContainerProps> = (props) => {
                             {children}
                         </Card>
                     </Slide>
-                    {/* <AppInfoView /> */}
+                    <AppInfoView />
                 </Box>
             </AppContainerWrapper>
         </Box>

@@ -8,6 +8,7 @@ import {
     ErrorFallbackProps,
     useQueryErrorResetBoundary,
     Head,
+    useParams
 } from "blitz"
 import LoginForm from "app/auth/components/LoginForm"
 import { AppContextProvider, AppLoader } from "@zhava/index"
@@ -46,15 +47,15 @@ export default function App(
     return (
         <CacheProvider value={emotionCache}>
             <CssBaseline />
+            {globalStyles}
+            <Head>
+                <title>ژاوا</title>
+                <meta name='viewport' content='initial-scale=1, width=device-width' />
+            </Head>
             <ErrorBoundary
                 FallbackComponent={RootErrorFallback}
                 onReset={useQueryErrorResetBoundary().reset}
             >
-                {globalStyles}
-                <Head>
-                    <title>ژاوا</title>
-                    <meta name='viewport' content='initial-scale=1, width=device-width' />
-                </Head>
                 <AppContextProvider>
                     <Provider store={store}>
                         <AppThemeProvider>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import { Form } from "formik";
 import IntlMessages from "@zhava/utility/IntlMessages";
 import { Fonts } from "shared/constants/AppEnums";
@@ -10,6 +10,7 @@ import { AppLoader } from "@zhava/index";
 import getClients from "app/clients/backend/queries/getClients";
 import DiscountPart from "./Form/DiscountPart";
 import AppTextFieldNumber from "@zhava/core/AppFormComponents/AppTextFieldNumber";
+import LoaderSpinner from "@zhava/core/AppLoader/LoaderSpiner";
 
 interface AddContactFormProps {
     handleAddContactClose: () => void;
@@ -25,7 +26,7 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
     selectContact
 }) => {
 
-    const [clients] = useQuery(getClients, {
+    const [clients, { isLoading }] = useQuery(getClients, {
         where: {
             where: {
                 isActive: true,
@@ -39,7 +40,9 @@ const AddContactForm: React.FC<AddContactFormProps> = ({
                 })
             }
         }
-    });
+    }, { suspense: false });
+
+    if (isLoading) return <LoaderSpinner />;
 
     return (
         <Form noValidate autoComplete="off">

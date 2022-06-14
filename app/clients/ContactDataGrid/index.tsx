@@ -7,14 +7,16 @@ import { GetClientResult } from '../types';
 import AppsHeader from '@zhava/core/AppsContainer/AppsHeader';
 import { AppSearchBar } from '@zhava/index';
 import { useRouter } from 'blitz';
+import LoaderSpinner from '@zhava/core/AppLoader/LoaderSpiner';
 
 interface Props {
-    clients: GetClientResult;
+    clients?: GetClientResult;
+    isClientLoading?: boolean;
     deleteHandle: (id: number) => Promise<void>;
     handleAddOrUpdateContact: (opration: 'add' | 'update', data: any) => Promise<void>;
 }
 
-const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateContact }) => {
+const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateContact, isClientLoading }) => {
     const contentRef = createRef();
     const [keyword, setKeyword] = useState('');
 
@@ -31,6 +33,8 @@ const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateCont
             }
         }), 1000);
     }
+
+
     return <Box
         sx={{
             height: '100%',
@@ -52,15 +56,17 @@ const ContatctsList: FC<Props> = ({ clients, deleteHandle, handleAddOrUpdateCont
                         iconPosition="right"
                         overlap={false}
                         value={keyword}
+                        sx={{ pointerEvents: isClientLoading ? 'none' : 'auto' }}
                         onChange={(event: any) => handleSearch(event.target.value)}
                         placeholder={"جستجوی کاربر"}
                     />
                 </Box>
             </Box>
         </AppsHeader>
+        {isClientLoading && <Box sx={{ mt: { xs: 10, md: 30 } }}><LoaderSpinner /></Box>}
         <AppsContent sx={{ pt: 0 }}>
             <Box sx={{ width: '100%', px: 0.5, pb: 5 }}>
-                {clients.length &&
+                {clients &&
                     <DataGrid
                         sx={{ border: 'unset', width: '100%' }}
                         rows={clients}
