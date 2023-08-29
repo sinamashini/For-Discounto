@@ -4,8 +4,7 @@
   "scripts": {
     "predev": "docker-compose up -d",
     "dev": "blitz dev",
-    "dev:quirrel": "concurrently --raw \"blitz dev\" 'quirrel'",
-    "build": "blitz build && next build && quirrel ci",
+    "build": "blitz build && next build",
     "start:production": "blitz start --port 5000 ",
     "start": "blitz start",
     "studio": "blitz prisma studio",
@@ -61,7 +60,6 @@
     "persianjs": "0.4.0",
     "prism-react-renderer": "1.2.1",
     "prop-types": "15.8.1",
-    "quirrel": "1.x",
     "raw-loader": "4.0.2",
     "react": "18.0.0-alpha-5ca4b0433-20211020",
     "react-bottom-scroll-listener": "5.0.0",
@@ -103,10 +101,10 @@
     "husky": "7.0.4",
     "lint-staged": "12.3.2",
     "prettier": "2.x",
-    "prettier-plugin-prisma": "3.x",
+    "prettier-plugin-prisma": "latest",
     "pretty-quick": "3.x",
     "preview-email": "3.x",
-    "prisma": "3.12.0",
+    "prisma": "latest",
     "typescript": "~4.5"
   },
   "private": true
